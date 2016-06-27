@@ -1,0 +1,39 @@
+Pumpkin in Swift + Metal
+
+-	add remaining features from original/Cocos2D version
+	-	particles
+	-	ball trail
+	-	bouncy lines
+
+-	port to Metal (keep OpenGL handy too?)
+	-	how to load textures?
+
+-	convert GLKit vector stuff to simd
+	-	https://github.com/raywenderlich/SKTUtils/tree/master/SKTUtils
+	-	probably add my own helper functions
+	-	https://developer.apple.com/library/ios/samplecode/MetalBasic3D/Listings/MetalBasic3D_AAPLTransforms_mm.html#//apple_ref/doc/uid/TP40014603-MetalBasic3D_AAPLTransforms_mm-DontLinkElementID_7
+	-	see Metal by Example for helper functions
+
+-	make sure nodes and sprites get deallocated etc
+-	timers: what happens if there is a big shift in system time (because
+	the game was paused etc)?
+-	put in git repo
+-	also on iPhone (just scale from 1024x768 scene to device size?)
+-	add a delay of a second before showing everything
+
+-	docs:
+		Juice it or lose it - a talk by Martin Jonasson & Petri Purho (2012)
+		https://www.youtube.com/watch?v=Fy0aCDmgnxg
+		https://github.com/grapefrukt/juicy-breakout
+
+		Ray Wenderlich - Adding Juice to your Games (AltConf 2014)
+		https://www.youtube.com/watch?v=5aGFPpMvILY
+
+-	clean up code: make more Swift-like
+	-	clean up the OpenGL shit
+		https://github.com/joshb/CocoaOpenGL-Swift/tree/master/CocoaOpenGL-Swift
+		https://github.com/bradley/iOSSwiftOpenGL
+	-	Node.sprite should automatically unwrap already (shape too)
+			and give error message if no sprite set
+	-	put into its own Module
+	-	organize the classes into groups (Tweens, Scene Graph, OpenGL, etc)
