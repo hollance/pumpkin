@@ -1,6 +1,6 @@
 import UIKit
 import OpenGLES
-import GLKit
+import simd
 
 public func logOpenGLError(file: String = #file, line: UInt = #line) {
   let err = glGetError()
@@ -13,14 +13,14 @@ public func logOpenGLError(file: String = #file, line: UInt = #line) {
 public class RenderingEngine {
 
   /*! Dimensions of the visible screen. Equal to the bounds of the OpenGL view. */
-  public let viewportSize: GLKVector2
+  public let viewportSize: float2
 
   /*! Fill color for the background. Default is black. */
-  public var clearColor = GLKVector4Make(0, 0, 0, 1)
+  public var clearColor = float4(0, 0, 0, 1)
 
   /*! For special effects. */
-  public var modelviewMatrix = GLKMatrix4Identity
-  private var projectionMatrix = GLKMatrix4Identity
+  public var modelviewMatrix = float4x4.identity
+  private var projectionMatrix = float4x4.identity
 
   /*! The items to be rendered. */
   public var renderQueue = RenderQueue()
@@ -36,7 +36,7 @@ public class RenderingEngine {
 
   public init(view: OpenGLView) {
 		eaglLayer = view.layer as! CAEAGLLayer
-		viewportSize = GLKVector2Make(Float(view.bounds.width), Float(view.bounds.height))
+		viewportSize = float2(Float(view.bounds.width), Float(view.bounds.height))
 		screenScale = Float(UIScreen.mainScreen().scale)
 
     setUpContext()
@@ -96,15 +96,15 @@ public class RenderingEngine {
     let a = 2 / width
     let b = 2 / height
 
-    projectionMatrix = GLKMatrix4Make(
-      a,  0,  0, 0,
-      0, -b,  0, 0,   // -b flips the vertical axis
-      0,  0, -1, 0,
-      -1, 1, -1, 1    // moves (0,0) into top-left corner
-    )
+    projectionMatrix = float4x4([
+      [ a,  0,  0, 0, ],
+      [ 0, -b,  0, 0, ],   // -b flips the vertical axis
+      [ 0,  0, -1, 0, ],
+      [ -1, 1, -1, 1  ]   // moves (0,0) into top-left corner
+    ])
 
     // Scale up for Retina
-    projectionMatrix = GLKMatrix4Scale(projectionMatrix, screenScale, screenScale, screenScale)
+    projectionMatrix = projectionMatrix * float4x4(uniformScale: screenScale)
   }
 
   private func setUpShaders() {
@@ -116,7 +116,7 @@ public class RenderingEngine {
     glEnable(GLenum(GL_BLEND))
     glEnable(GLenum(GL_CULL_FACE))
 
-    modelviewMatrix = GLKMatrix4Identity
+    modelviewMatrix = float4x4.identity
   }
 
   private func printOpenGLInfo() {
@@ -134,7 +134,7 @@ public class RenderingEngine {
     glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w)
     glClear(GLenum(GL_COLOR_BUFFER_BIT))
 
-    renderContext.matrix = GLKMatrix4Multiply(projectionMatrix, modelviewMatrix)
+    renderContext.matrix = projectionMatrix * modelviewMatrix
     renderQueue.render(renderContext)
 
     context.presentRenderbuffer(Int(GL_RENDERBUFFER))

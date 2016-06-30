@@ -1,6 +1,6 @@
 import Foundation
 import UIKit
-import GLKit
+import simd
 
 /*!
   Contains a list of sprite frame rectangles.
@@ -43,13 +43,13 @@ public class SpriteSheet {
           let h = dict["height"]! as! Float
 
           var spriteFrame = SpriteFrame()
-          spriteFrame.contentSize = GLKVector2Make(w/scale, h/scale)
+          spriteFrame.contentSize = float2(w/scale, h/scale)
 
           let nx = x / textureWidth
           let ny = y / textureHeight
           let nw = w / textureWidth
           let nh = h / textureHeight
-          spriteFrame.texCoords = GLKVector4Make(nx, ny, nx + nw, ny + nh)
+          spriteFrame.texCoords = float4(nx, ny, nx + nw, ny + nh)
 
           frames[s as String] = spriteFrame
         }

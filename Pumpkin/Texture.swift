@@ -1,4 +1,5 @@
 import GLKit
+import simd
 import OpenGLES
 
 /*! Can load PNG textures. */
@@ -15,11 +16,11 @@ public class Texture {
   }
 
   /*! The size of the texture in points. */
-  public var contentSize: GLKVector2 {
+  public var contentSize: float2 {
     if let info = info {
-      return GLKVector2Make(Float(info.width), Float(info.height))
+      return float2(Float(info.width), Float(info.height))
     } else {
-      return GLKVector2Make(0, 0)
+      return float2.zero
     }
   }
 

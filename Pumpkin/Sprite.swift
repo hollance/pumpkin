@@ -1,4 +1,4 @@
-import GLKit
+import simd
 import OpenGLES
 
 /*! Visual for a node that draws part of a texture. */
@@ -19,7 +19,7 @@ public class Sprite: Visual, Tweenable, Renderer {
     didSet { needsRedraw = true }
   }
 
-  public var anchorPoint = GLKVector2Make(0.5, 0.5) {
+  public var anchorPoint = float2(0.5, 0.5) {
     didSet { needsRedraw = true }
   }
 
@@ -31,7 +31,7 @@ public class Sprite: Visual, Tweenable, Renderer {
     didSet { needsRedraw = true }
   }
 
-  public var contentSize: GLKVector2 {
+  public var contentSize: float2 {
     if let sf = activeSpriteFrame {
       return sf.contentSize
     } else if let sf = spriteFrame {
@@ -43,17 +43,17 @@ public class Sprite: Visual, Tweenable, Renderer {
     }
   }
 
-  public var texCoords: GLKVector4 {
+  public var texCoords: float4 {
     if let sf = activeSpriteFrame {
       return sf.texCoords
     } else if let sf = spriteFrame {
       return sf.texCoords
     } else {
-      return GLKVector4Make(0, 0, 1, 1)
+      return float4(0, 0, 1, 1)
     }
   }
 
-  public var color = GLKVector4Make(1, 1, 1, 1) {
+  public var color = float4(1, 1, 1, 1) {
     didSet { needsRedraw = true }
   }
 
@@ -62,8 +62,8 @@ public class Sprite: Visual, Tweenable, Renderer {
   }
 
   // TODO: these belong only in Node
-  public var position = GLKVector2Make(0, 0)
-  public var scale = GLKVector2Make(1, 1)
+  public var position = float2(0, 0)
+  public var scale = float2(1, 1)
   public var angle: Float = 0
 
 
@@ -81,7 +81,7 @@ public class Sprite: Visual, Tweenable, Renderer {
 
   /*! A placeholder is a sprite without a texture and only a color. If texture
       and spriteFrame are both nil, set this property to make it a placeholder. */
-  public var placeholderContentSize = GLKVector2() {
+  public var placeholderContentSize = float2.zero {
     didSet { needsRedraw = true }
   }
 
@@ -99,7 +99,7 @@ public class Sprite: Visual, Tweenable, Renderer {
 
     Note: The value of boundingBox is incorrect when the sprite is hidden!
   */
-  public var boundingBox: GLKVector4 {
+  public var boundingBox: float4 {
     let quad = texturedQuad
 
     var minX =  Float.infinity
@@ -131,7 +131,7 @@ public class Sprite: Visual, Tweenable, Renderer {
       if y < minY { minY = y }
     }
 
-    return GLKVector4Make(minX, minY, maxX, maxY)
+    return float4(minX, minY, maxX, maxY)
   }
 
   /*! A cached copy of the quad. We only recompute this if quadDirty. */
@@ -146,10 +146,10 @@ public class Sprite: Visual, Tweenable, Renderer {
         // This is a quick optimization so not all quads have to be
         // re-ordered if you just want to hide one sprite.
 
-        quad.tl.position = GLKVector2Make(0, 0)  //float2()
-        quad.tr.position = GLKVector2Make(0, 0)  //float2()
-        quad.br.position = GLKVector2Make(0, 0)  //float2()
-        quad.bl.position = GLKVector2Make(0, 0)  //float2()
+        quad.tl.position = float2.zero
+        quad.tr.position = float2.zero
+        quad.br.position = float2.zero
+        quad.bl.position = float2.zero
 
 //        quad.vertex[0].position = GLKVector2Make(0, 0)  //float2()
 //        quad.vertex[1].position = GLKVector2Make(0, 0)  //float2()
@@ -169,10 +169,10 @@ public class Sprite: Visual, Tweenable, Renderer {
         let ax2 = ax1 + contentSize.x
         let ay2 = ay1 + contentSize.y
 
-        quad.tl.position = GLKVector2Make(ax1, ay1)
-        quad.tr.position = GLKVector2Make(ax2, ay1)
-        quad.br.position = GLKVector2Make(ax2, ay2)
-        quad.bl.position = GLKVector2Make(ax1, ay2)
+        quad.tl.position = float2(ax1, ay1)
+        quad.tr.position = float2(ax2, ay1)
+        quad.br.position = float2(ax2, ay2)
+        quad.bl.position = float2(ax1, ay2)
 
 //        quad.vertex[0].position = GLKVector2Make(ax1, ay1)
 //        quad.vertex[1].position = GLKVector2Make(ax2, ay1)
@@ -184,17 +184,17 @@ public class Sprite: Visual, Tweenable, Renderer {
         let tx2 = flipX ? texCoords.x : texCoords.z
         let ty2 = flipY ? texCoords.y : texCoords.w
 
-        quad.tl.texCoord = GLKVector2Make(tx1, ty1)
-        quad.tr.texCoord = GLKVector2Make(tx2, ty1)
-        quad.br.texCoord = GLKVector2Make(tx2, ty2)
-        quad.bl.texCoord = GLKVector2Make(tx1, ty2)
+        quad.tl.texCoord = float2(tx1, ty1)
+        quad.tr.texCoord = float2(tx2, ty1)
+        quad.br.texCoord = float2(tx2, ty2)
+        quad.bl.texCoord = float2(tx1, ty2)
 
 //        quad.vertex[0].texCoord = GLKVector2Make(tx1, ty1)
 //        quad.vertex[1].texCoord = GLKVector2Make(tx2, ty1)
 //        quad.vertex[2].texCoord = GLKVector2Make(tx2, ty2)
 //        quad.vertex[3].texCoord = GLKVector2Make(tx1, ty2)
 
-        let transform = node?.transform ?? GLKMatrix4Identity
+        let transform = node?.transform ?? float4x4.identity
 
         let spriteColor: [GLubyte] = [
           GLubyte(color.x * 255),
@@ -203,15 +203,7 @@ public class Sprite: Visual, Tweenable, Renderer {
           GLubyte(color.w * alpha * 255),
         ]
 
-        // TODO: ugh
-        var m = [Float](count: 16, repeatedValue: 0)
-        m[0] = transform.m00
-        m[1] = transform.m01
-        m[4] = transform.m10
-        m[5] = transform.m11
-        m[12] = transform.m30
-        m[13] = transform.m31
-
+        let m = transform.openGLMatrix
 
         for t in 0..<4 {
           //TODO: kinda lame
@@ -233,7 +225,7 @@ public class Sprite: Visual, Tweenable, Renderer {
 //          quad.vertex[t].position.x = transform[0, 0] * x + transform[1, 0] * y + transform[3, 0]
 //          quad.vertex[t].position.y = transform[0, 1] * x + transform[1, 1] * y + transform[3, 1]
 
-          v.position = GLKVector2Make(
+          v.position = float2(
             m[0] * x + m[4] * y + m[12],
             m[1] * x + m[5] * y + m[13])
 
@@ -351,26 +343,7 @@ public class Sprite: Visual, Tweenable, Renderer {
 
     glUseProgram(shaderProgram.programName)
 
-    var m = [Float](count: 16, repeatedValue: 0)
-    m[0] = context.matrix.m00
-    m[1] = context.matrix.m01
-    m[2] = context.matrix.m02
-    m[3] = context.matrix.m03
-    m[4] = context.matrix.m10
-    m[5] = context.matrix.m11
-    m[6] = context.matrix.m12
-    m[7] = context.matrix.m13
-    m[8] = context.matrix.m20
-    m[9] = context.matrix.m21
-    m[10] = context.matrix.m22
-    m[11] = context.matrix.m23
-    m[12] = context.matrix.m30
-    m[13] = context.matrix.m31
-    m[14] = context.matrix.m32
-    m[15] = context.matrix.m33
-
-    let uniforms = shaderProgram.uniforms
-    glUniformMatrix4fv(GLint(uniforms.matrix), 1, GLboolean(GL_FALSE), m)
+    glUniformMatrix4fv(GLint(shaderProgram.uniforms.matrix), 1, GLboolean(GL_FALSE), context.matrix.openGLMatrix)
 
     glEnableVertexAttribArray(shaderProgram.attributes.position)
     glEnableVertexAttribArray(shaderProgram.attributes.color)

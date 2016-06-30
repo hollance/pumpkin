@@ -1,4 +1,4 @@
-import GLKit
+import simd
 
 /*! Base class for a visual that can draw arbitrary triangles. */
 public class Shape: Visual, Renderer {
@@ -7,11 +7,11 @@ public class Shape: Visual, Renderer {
   public var hidden: Bool = false
 
   // TODO: a shape doesn't use these properties from Visual!
-  public var anchorPoint = GLKVector2Make(0.5, 0.5)
+  public var anchorPoint = float2(0.5, 0.5)
   public var flipX: Bool = false
   public var flipY: Bool = false
-  public var contentSize = GLKVector2Make(0, 0)
-  public var texCoords = GLKVector4Make(0, 0, 1, 1)
+  public var contentSize = float2.zero
+  public var texCoords = float4(0, 0, 1, 1)
 
   public init() { }
 

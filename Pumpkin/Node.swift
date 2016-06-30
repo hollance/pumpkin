@@ -1,19 +1,19 @@
-import GLKit
+import simd
 
 /*! Model object for something that is displayed on the screen. */
 public class Node: Tweenable {
 
   // TODO: these don't belong here but in Sprite
-  public var color = GLKVector4(v: (1, 1, 1, 1)) //: float4 = .init(1, 1, 1, 1)
+  public var color = float4(1, 1, 1, 1)
   public var alpha: Float = 1.0
 
 
 
-  public var position = GLKVector2Make(0, 0) {
+  public var position = float2(0, 0) {
     didSet { localTransformDirty = true }
   }
 
-  public var scale = GLKVector2Make(1, 1) {
+  public var scale = float2(1, 1) {
     didSet { localTransformDirty = true }
   }
 
@@ -73,10 +73,10 @@ public class Node: Tweenable {
 
   /*! The transform for this node. The transform of the parent has already been
       applied to this, so it's in world coordinates. */
-  private(set) public var transform = GLKMatrix4Identity
+  private(set) public var transform = float4x4.identity
 
   /*! The transform in object coordinates. */
-  private var localTransform = GLKMatrix4Identity
+  private var localTransform = float4x4.identity
   private var localTransformDirty = true
 
   // MARK: - Building the scene graph
@@ -149,16 +149,16 @@ public class Node: Tweenable {
     var s: Float = 0
 
     if angle != 0 {
-      let radians = angle.degreesToRadians()
+      let radians = angle.degreesToRadians
       s = sinf(radians)
       c = cosf(radians)
     }
 
-    localTransform = GLKMatrix4Make(
-       c * scale.x, s * scale.x, 0, 0,
-      -s * scale.y, c * scale.y, 0, 0,
-                 0,           0, 1, 0,
-        position.x,  position.y, 0, 1)
+    localTransform = float4x4([
+      [  c * scale.x, s * scale.x, 0, 0, ],
+      [ -s * scale.y, c * scale.y, 0, 0, ],
+      [            0,           0, 1, 0, ],
+      [   position.x,  position.y, 0, 1  ]])
   }
 
   private func updateTransform() {
@@ -168,7 +168,7 @@ public class Node: Tweenable {
     }
 
     if let parent = parent {
-      transform = GLKMatrix4Multiply(parent.transform, localTransform)
+      transform = parent.transform * localTransform
     } else {
       transform = localTransform
     }
@@ -207,12 +207,12 @@ extension Node {
     - rate How fast the node rotates. Must have a value between 0.0 and 1.0,
            where smaller means slower; 1.0 is instantaneous.
    */
-  public func rotateToVelocity(velocity: GLKVector2, rate: Float) {
+  public func rotateToVelocity(velocity: float2, rate: Float) {
     // Determine what the rotation angle of the node ought to be based on the
     // current velocity of its physics body. This assumes that at 0 degrees the
     // node is pointed up, not to the right, so to compensate we add 90 degrees
     // from the calculated angle.
-    let newAngle = (atan2(velocity.y, velocity.x)).radiansToDegrees() + 90
+    let newAngle = (atan2(velocity.y, velocity.x)).radiansToDegrees + 90
 
     // This always makes the node rotate over the shortest possible distance.
     // Because the range of atan2() is -180 to 180 degrees, a rotation from,

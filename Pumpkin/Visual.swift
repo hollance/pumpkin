@@ -1,4 +1,4 @@
-import GLKit
+import simd
 
 /*! The visual representation of a node. */
 public protocol Visual {
@@ -17,7 +17,7 @@ public protocol Visual {
   /*! The point in the visual where it is attached to the node, normalized to 
       the range 0.0f - 1.0f. The default value is (0.5f, 0.5f), i.e. the center
       of the image. */
-  var anchorPoint: GLKVector2 { get set }
+  var anchorPoint: float2 { get set }
 
   /*! Whether the visual is displayed horizontally flipped. */
   var flipX: Bool { get set }
@@ -25,6 +25,6 @@ public protocol Visual {
   /*! Whether the visual is displayed vertically flipped. */
   var flipY: Bool { get set }
 
-  var contentSize: GLKVector2 { get }
-  var texCoords: GLKVector4 { get }
+  var contentSize: float2 { get }
+  var texCoords: float4 { get }
 }

@@ -1,7 +1,7 @@
-import GLKit
+import simd
 
 /*! Checks whether a point lies inside a rectangle. */
-public func pointInBox(point: GLKVector2, _ box: GLKVector4) -> Bool {
+public func pointInBox(point: float2, _ box: float4) -> Bool {
 	if point.x < box.x { return false }
 	if point.y < box.y { return false }
 	if point.x > box.z { return false }
@@ -11,7 +11,7 @@ public func pointInBox(point: GLKVector2, _ box: GLKVector4) -> Bool {
 
 /*! Checks whether the point is inside the box and if so, calculates what the
     new position and velocity of the collision response should be. */
-public func pointBoxCollision(box box: GLKVector4, inout position: GLKVector2, inout velocity: GLKVector2, dt: Float) -> Bool {
+public func pointBoxCollision(box box: float4, inout position: float2, inout velocity: float2, dt: Float) -> Bool {
 
 	// Note: the collision response is very basic. It essentially moves the
 	// position's X or Y-coordinate back to what it was before the collision.
@@ -22,11 +22,16 @@ public func pointBoxCollision(box box: GLKVector4, inout position: GLKVector2, i
 	if pointInBox(position, box) {
 		let oldX = position.x - velocity.x*dt
 		if oldX < box.x || oldX > box.z {
-			velocity = GLKVector2Make(-velocity.x, velocity.y)
-			position = GLKVector2Make(position.x + velocity.x*dt, position.y)
+      velocity.x = -velocity.x
+      position.x += velocity.x*dt
+//TODO cleanup
+//			velocity = float2(-velocity.x, velocity.y)
+//			position = float2(position.x + velocity.x*dt, position.y)
 		} else {
-			velocity = GLKVector2Make(velocity.x, -velocity.y)
-			position = GLKVector2Make(position.x , position.y + velocity.y*dt)
+      velocity.y = -velocity.y
+      position.y += velocity.y*dt
+//			velocity = float2(velocity.x, -velocity.y)
+//			position = float2(position.x , position.y + velocity.y*dt)
 		}
 		return true
 	}

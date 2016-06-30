@@ -1,9 +1,9 @@
-import GLKit
+import simd
 
 /*! A textured and colored vertex. Used for drawing sprites. */
 public struct TexturedVertex {
-  public var position = GLKVector2()
-  public var texCoord = GLKVector2()
+  public var position = float2.zero
+  public var texCoord = float2.zero
 
   public var r: GLubyte = 0
   public var g: GLubyte = 0
@@ -20,7 +20,7 @@ public struct TexturedVertex {
 
 extension TexturedVertex: CustomStringConvertible {
   public var description: String {
-    return String(format: "pos %@, tex %@, color %d %d %d %d", NSStringFromGLKVector2(position), NSStringFromGLKVector2(texCoord), r, g, b, a)
+    return String(format: "pos (%g, %g), tex (%g, %g), color (%d, %d, %d, %d)", position.x, position.y, texCoord.x, texCoord.y, r, g, b, a)
   }
 }
 
@@ -45,7 +45,7 @@ extension TexturedQuad: CustomStringConvertible {
 
 /*! A colored vertex. */
 public struct ColoredVertex {
-  public var position = GLKVector2()
+  public var position = float2.zero
 
   public var r: GLubyte = 0
   public var g: GLubyte = 0

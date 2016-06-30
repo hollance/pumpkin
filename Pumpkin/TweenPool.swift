@@ -1,4 +1,4 @@
-import GLKit
+import simd
 
 /*! Manages PPTween objects. */
 public class TweenPool {
@@ -178,7 +178,7 @@ extension TweenPool {
      - amount The vector by which the node is displaced.
      - oscillations The number of oscillations. 10 is a good value.
   */
-  public func screenShake(node node: Node, amount: GLKVector2, oscillations: Int, duration: Float) -> Tween {
+  public func screenShake(node node: Node, amount: float2, oscillations: Int, duration: Float) -> Tween {
     // Note: For optimal performance, you should create the shake function
     // just once and cache it. In the current implementation it allocates a 
     // new closure instance every time you start a screen shake.
@@ -219,7 +219,7 @@ extension TweenPool {
 
     You usually want to apply this to a pivot node that is centered in the scene.
   */
-  public func screenZoom(node node: Node, amount: GLKVector2, oscillations: Int, duration: Float) -> Tween {
+  public func screenZoom(node node: Node, amount: float2, oscillations: Int, duration: Float) -> Tween {
     let tween = scaleFromTween()
     tween.target = node
     tween.amount = amount

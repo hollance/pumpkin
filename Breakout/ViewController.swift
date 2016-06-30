@@ -1,5 +1,5 @@
 import UIKit
-import GLKit
+import simd
 import Pumpkin
 
 class ViewController: UIViewController, EngineDelegate {
@@ -11,7 +11,7 @@ class ViewController: UIViewController, EngineDelegate {
   var timerPool = TimerPool()
 	let spriteBatch = SpriteBatch()
   var spriteSheet: SpriteSheet!
-  var viewportSize = PPVector2Zero
+  var viewportSize = float2.zero
 
   var logoTexture: Texture!
 
@@ -19,7 +19,7 @@ class ViewController: UIViewController, EngineDelegate {
 
   var paddleNode: Node!
 	var previousTouchLocation = CGPoint.zero
-	var paddleScale = GLKVector2Make(1, 1)
+	var paddleScale = float2(1, 1)
 
 	var leftEyeNode: Node!
 	var rightEyeNode: Node!
@@ -39,7 +39,7 @@ class ViewController: UIViewController, EngineDelegate {
   var hitBorder = false
   var hitPaddle = false
   var hitBrick = false
-	var hitVector = GLKVector2Make(0, 0)
+	var hitVector = float2.zero
 
 	// Distance to the center of the border that was hit, in a percentage
 	// of the border's length (half of the length, actually, so it goes from
@@ -147,8 +147,8 @@ class ViewController: UIViewController, EngineDelegate {
     // the world around that. But we still want the top-left corner of the
     // world in the top-left corner of the screen, so move the world node back.
     engine.rootNode.angle = 0
-    engine.rootNode.position = GLKVector2Make(viewportSize.x/2, viewportSize.y/2)
-    worldNode.position = GLKVector2Negate(engine.rootNode.position)
+    engine.rootNode.position = float2(viewportSize.x/2, viewportSize.y/2)
+    worldNode.position = -engine.rootNode.position
 
     setUpPaddle()
     setUpBorders()
@@ -166,7 +166,7 @@ class ViewController: UIViewController, EngineDelegate {
   }
 
   func setUpPaddle() {
-    paddleScale = GLKVector2Make(1, 1)
+    paddleScale = float2(1, 1)
 
     let paddleSprite = Sprite()
     paddleSprite.spriteFrame = spriteSheet["Paddle"]
@@ -174,7 +174,7 @@ class ViewController: UIViewController, EngineDelegate {
     spriteBatch.add(paddleSprite)
 
     paddleNode = Node()
-    paddleNode.position = GLKVector2Make(viewportSize.x/2, viewportSize.y - 60)
+    paddleNode.position = float2(viewportSize.x/2, viewportSize.y - 60)
     paddleNode.visual = paddleSprite
     paddleNode.name = "Paddle"
     worldNode.add(paddleNode)
@@ -219,7 +219,7 @@ class ViewController: UIViewController, EngineDelegate {
     engine.renderingEngine.renderQueue.add(leftBorderShape)
 
     leftBorder = Node()
-    leftBorder.position = GLKVector2Make(0, 0)
+    leftBorder.position = float2(0, 0)
     leftBorder.angle = 0
     leftBorder.visual = leftBorderShape
     leftBorder.name = "Left Border"
@@ -230,7 +230,7 @@ class ViewController: UIViewController, EngineDelegate {
     engine.renderingEngine.renderQueue.add(rightBorderShape)
 
     rightBorder = Node()
-    rightBorder.position = GLKVector2Make(viewportSize.x, viewportSize.y)
+    rightBorder.position = float2(viewportSize.x, viewportSize.y)
     rightBorder.angle = 180
     rightBorder.visual = rightBorderShape
     rightBorder.name = "Right Border"
@@ -241,7 +241,7 @@ class ViewController: UIViewController, EngineDelegate {
     engine.renderingEngine.renderQueue.add(topBorderShape)
 
     topBorder = Node()
-    topBorder.position = GLKVector2Make(0, BorderThickness)
+    topBorder.position = float2(0, BorderThickness)
     topBorder.angle = -90
     topBorder.visual = topBorderShape
     topBorder.name = "Top Border"
@@ -280,7 +280,7 @@ class ViewController: UIViewController, EngineDelegate {
         /**/
         
         let brickNode = Node()
-        brickNode.position = GLKVector2Make(152 + Float(i)*90, 90 + Float(j)*40)
+        brickNode.position = float2(152 + Float(i)*90, 90 + Float(j)*40)
         brickNode.visual = brickSprite
         brickNode.name = "Brick"
         worldNode.add(brickNode)
@@ -341,7 +341,7 @@ class ViewController: UIViewController, EngineDelegate {
     spriteBatch.add(ballSprite)
 
     let ballNode = Ball()
-    ballNode.position = GLKVector2Make(viewportSize.x / 2, viewportSize.y - 220)
+    ballNode.position = float2(viewportSize.x / 2, viewportSize.y - 220)
     ballNode.visual = ballSprite
     ballNode.name = "Ball"
     worldNode.add(ballNode)
@@ -350,8 +350,8 @@ class ViewController: UIViewController, EngineDelegate {
 
     // Assign a random angle to the ball's velocity
     let ballSpeed: Float = 400
-    let angle: Float = (Float.random() * 360).degreesToRadians()
-    ballNode.velocity = GLKVector2Make(cosf(angle)*ballSpeed, sinf(angle)*ballSpeed)
+    let angle: Float = (Float.random() * 360).degreesToRadians
+    ballNode.velocity = float2(cosf(angle)*ballSpeed, sinf(angle)*ballSpeed)
   }
 
   // MARK: - Settings
@@ -422,13 +422,13 @@ class ViewController: UIViewController, EngineDelegate {
       mouthNode.sprite.hidden = true
     }
 
-    leftEyeNode.position = GLKVector2Make(-settings.paddleEyeSeparation, -2)
-    rightEyeNode.position = GLKVector2Make(settings.paddleEyeSeparation, -2)
-    mouthNode.position = GLKVector2Make(0, 3)
+    leftEyeNode.position = float2(-settings.paddleEyeSeparation, -2)
+    rightEyeNode.position = float2(settings.paddleEyeSeparation, -2)
+    mouthNode.position = float2(0, 3)
 
-    leftEyeNode.scale = GLKVector2Make(settings.paddleEyeScale, settings.paddleEyeScale)
+    leftEyeNode.scale = float2(settings.paddleEyeScale, settings.paddleEyeScale)
     rightEyeNode.scale = leftEyeNode.scale
-    mouthNode.scale = GLKVector2Make(settings.paddleMouthScale, settings.paddleMouthScale)
+    mouthNode.scale = float2(settings.paddleMouthScale, settings.paddleMouthScale)
   }
 
   // MARK: - Tweening
@@ -447,7 +447,7 @@ class ViewController: UIViewController, EngineDelegate {
       if settings.tweenYPosition {
         let tween = tweenPool.moveFromTween()
         tween.target = node
-        tween.amount = GLKVector2Make(0, -viewportSize.y*0.8)
+        tween.amount = float2(0, -viewportSize.y*0.8)
         tween.duration = settings.tweeningDuration
         tween.delay = delay
         tween.timingFunction = timingFunction()
@@ -467,7 +467,7 @@ class ViewController: UIViewController, EngineDelegate {
       if settings.tweenScale {
         let tween = tweenPool.scaleFromTween()
         tween.target = node
-        tween.amount = GLKVector2Make(0.25, 0.25)
+        tween.amount = float2(0.25, 0.25)
         tween.duration = settings.tweeningDuration
         tween.delay = delay
         tween.timingFunction = timingFunction()
@@ -491,7 +491,7 @@ class ViewController: UIViewController, EngineDelegate {
     if settings.tweenBorders {
       let tweenLeft = tweenPool.moveFromTween()
       tweenLeft.target = leftBorder
-      tweenLeft.amount = GLKVector2Make(-50, 0)
+      tweenLeft.amount = float2(-50, 0)
       tweenLeft.duration = settings.tweeningDuration
       tweenLeft.delay = 0
       tweenLeft.timingFunction = TimingFunctionBounceEaseOut
@@ -499,7 +499,7 @@ class ViewController: UIViewController, EngineDelegate {
 
       let tweenTop = tweenPool.moveFromTween()
       tweenTop.target = topBorder
-      tweenTop.amount = GLKVector2Make(0, -50)
+      tweenTop.amount = float2(0, -50)
       tweenTop.duration = settings.tweeningDuration
       tweenTop.delay = 0.5
       tweenTop.timingFunction = TimingFunctionBounceEaseOut
@@ -507,7 +507,7 @@ class ViewController: UIViewController, EngineDelegate {
 
       let tweenRight = tweenPool.moveFromTween()
       tweenRight.target = rightBorder
-      tweenRight.amount = GLKVector2Make(50, 0)
+      tweenRight.amount = float2(50, 0)
       tweenRight.duration = settings.tweeningDuration
       tweenRight.delay = 0
       tweenRight.timingFunction = TimingFunctionBounceEaseOut
@@ -521,12 +521,12 @@ class ViewController: UIViewController, EngineDelegate {
 
       let logoNode = Node()
       logoNode.visual = logoSprite
-      logoNode.position = GLKVector2Make(0, viewportSize.y/2 + logoTexture.contentSize.y/2)
+      logoNode.position = float2(0, viewportSize.y/2 + logoTexture.contentSize.y/2)
       engine.rootNode.add(logoNode)
 
       let moveTween = tweenPool.moveToTween()
       moveTween.target = logoNode
-      moveTween.amount = GLKVector2Make(0, -(viewportSize.y + logoTexture.contentSize.y)/2)
+      moveTween.amount = float2(0, -(viewportSize.y + logoTexture.contentSize.y)/2)
       moveTween.duration = 2
       moveTween.delay = 1
       moveTween.timingFunction = TimingFunctionExponentialEaseOut
@@ -542,7 +542,7 @@ class ViewController: UIViewController, EngineDelegate {
 
       let scaleTween = tweenPool.scaleToTween()
       scaleTween.target = logoNode
-      scaleTween.amount = GLKVector2Make(4, 4)
+      scaleTween.amount = float2(4, 4)
       scaleTween.duration = moveTween.duration
       scaleTween.delay = rotateTween.delay
       scaleTween.timingFunction = moveTween.timingFunction
@@ -596,14 +596,14 @@ class ViewController: UIViewController, EngineDelegate {
       previousTouchLocation = newLocation
 
       let newX = fclampf(paddleNode.position.x + deltaX, min: BorderThickness + 65, max: viewportSize.x - BorderThickness - 65)
-      paddleNode.position = GLKVector2Make(newX, paddleNode.position.y)
+      paddleNode.position = float2(newX, paddleNode.position.y)
 
       if settings.paddleStretch {
-        var newScale = GLKVector2Make(1 + fabsf(deltaX)/50, 1 - fabsf(deltaX)/200)
+        var newScale = float2(1 + fabsf(deltaX)/50, 1 - fabsf(deltaX)/200)
         
         // Make sure the new scale doesn't become too small. If allowed to
         // become 0, the paddle will disappear, never to return.
-        newScale = PPVector2Clamp(newScale, min: GLKVector2Make(0.25, 0.25), max: GLKVector2Make(10.0, 10.0))
+        newScale = clamp(newScale, min: float2(0.25, 0.25), max: float2(10.0, 10.0))
 
         scalePaddle(newScale)
       }
@@ -613,22 +613,22 @@ class ViewController: UIViewController, EngineDelegate {
   override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
     // Note: When the touch goes out the screen or is cancelled, reset the
     // paddle scale or it will look funky.
-    scalePaddle(GLKVector2Make(1, 1))
+    scalePaddle(float2(1, 1))
   }
 
   override func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
-    scalePaddle(GLKVector2Make(1, 1))
+    scalePaddle(float2(1, 1))
   }
 
-  func scalePaddle(newScale: GLKVector2) {
+  func scalePaddle(newScale: float2) {
     // We cannot set the new scale directly on the paddle because there may
     // be tweens active that also change the scale (the jelly effect). Instead,
     // figure out by how much the scale should change and "add" that to the
     // existing scale.
 
-    let diff = GLKVector2Divide(newScale, paddleScale)
+    let diff = newScale / paddleScale
     paddleScale = newScale
-    paddleNode.scale = GLKVector2Multiply(paddleNode.scale, diff)
+    paddleNode.scale *= diff
   }
 
   // MARK: - Game loop
@@ -664,7 +664,7 @@ class ViewController: UIViewController, EngineDelegate {
 
         let tween = tweenPool.scaleFromTween()
         tween.target = paddleNode
-        tween.amount = GLKVector2Make(1.3, 1.2)
+        tween.amount = float2(1.3, 1.2)
         tween.duration = 0.5
         tween.timingFunction = TimingFunctionBounceEaseOut
         tween.name = "brickJelly"
@@ -681,11 +681,11 @@ class ViewController: UIViewController, EngineDelegate {
           // the start of the level, because it overwrites that other
           // scaling tween. (I won't fix that for this demo.)
 
-          brickNode.scale = GLKVector2Make(1, 1)
+          brickNode.scale = float2(1, 1)
 
           let tween = tweenPool.scaleFromTween()
           tween.target = brickNode
-          tween.amount = GLKVector2Make(1.15, 1.15)
+          tween.amount = float2(1.15, 1.15)
           tween.duration = 0.5
           tween.timingFunction = TimingFunctionBounceEaseOut
           tween.name = "brickJelly"
@@ -695,24 +695,24 @@ class ViewController: UIViewController, EngineDelegate {
 
       if settings.screenShakeEnabled {
         tweenPool.screenShake(node: worldNode,
-          amount: GLKVector2MultiplyScalar(hitVector, settings.screenShakePower),
+          amount: hitVector * settings.screenShakePower,
           oscillations: 10,
           duration: settings.screenShakeDuration)
       
         tweenPool.screenShake(node: paddleNode,
-          amount: GLKVector2Make(0, hitVector.y * settings.screenShakePower * -1.5),
+          amount: float2(0, hitVector.y * settings.screenShakePower * -1.5),
           oscillations: 10,
           duration: settings.screenShakeDuration)
       }
 
       if settings.screenTumbleEnabled {
-        let angle = (settings.screenShakePower * 4).degreesToRadians() * tumbleDistance
+        let angle = (settings.screenShakePower * 4).degreesToRadians * tumbleDistance
         tweenPool.screenTumble(node: engine.rootNode, angle: angle, oscillations: 10, duration: settings.screenShakeDuration)
       }
 
       if settings.screenZoomEnabled {
         tweenPool.screenZoom(node: engine.rootNode,
-          amount: GLKVector2Make(1.05, 1.05),
+          amount: float2(1.05, 1.05),
           oscillations: 10,
           duration: settings.screenShakeDuration)
       }
@@ -739,7 +739,7 @@ class ViewController: UIViewController, EngineDelegate {
         placeholderNode.position = brickSprite.node!.position
         placeholderNode.sprite.hidden = brickSprite.hidden
         let boundingBox = brickSprite.boundingBox
-        placeholderNode.sprite.placeholderContentSize = GLKVector2Make(boxWidth(boundingBox), boxHeight(boundingBox))
+        placeholderNode.sprite.placeholderContentSize = float2(boxWidth(boundingBox), boxHeight(boundingBox))
       }
     }
   }
@@ -762,7 +762,7 @@ class ViewController: UIViewController, EngineDelegate {
       mouthNode.angle = 180
     }
 
-    mouthNode.scale = GLKVector2Make(mouthNode.scale.x, mouthScaleY)
+    mouthNode.scale = float2(mouthNode.scale.x, mouthScaleY)
     mouthNode.sprite.hidden = (settings.paddleMouthScale == 0)
 
     // Look at the ball
@@ -771,12 +771,12 @@ class ViewController: UIViewController, EngineDelegate {
       // Cross-eyed
       //var deltaX = firstBall.position.x - leftEyeNode.position.x
       //var deltaY = firstBall.position.y - leftEyeNode.position.y
-      leftEyeNode.angle = (atan2f(deltaY, deltaX)).radiansToDegrees() - 90
+      leftEyeNode.angle = (atan2f(deltaY, deltaX)).radiansToDegrees - 90
 
       // Cross-eyed
       //deltaX = firstBall.position.x - rightEyeNode.position.x
       //deltaY = firstBall.position.y - rightEyeNode.position.y
-      rightEyeNode.angle = (atan2f(deltaY, deltaX)).radiansToDegrees() - 90
+      rightEyeNode.angle = (atan2f(deltaY, deltaX)).radiansToDegrees - 90
     } else {
       leftEyeNode.angle = 0
       rightEyeNode.angle = 0
@@ -797,8 +797,8 @@ class ViewController: UIViewController, EngineDelegate {
   func updateBall(ballNode: Ball, deltaTime dt: Float) {
     // Calculate new position of the ball
     
-    let velocityStep = GLKVector2MultiplyScalar(ballNode.velocity, dt)
-    var newPosition = GLKVector2Add(ballNode.position, velocityStep)
+    let velocityStep = ballNode.velocity * dt
+    var newPosition = ballNode.position + velocityStep
     
     // Check for collision with screen borders
 
@@ -807,29 +807,29 @@ class ViewController: UIViewController, EngineDelegate {
     var hitBorder = false
 
     if newPosition.x <= BorderThickness {
-      newVelocity = GLKVector2Make(-newVelocity.x, newVelocity.y)
-      newPosition = GLKVector2Make(BorderThickness, newPosition.y)
+      newVelocity = float2(-newVelocity.x, newVelocity.y)
+      newPosition = float2(BorderThickness, newPosition.y)
       hitBorder = true
       tumbleDistance = 2 * (ballNode.position.y - viewportSize.y/2) / viewportSize.y
     }
     else if newPosition.x >= viewportSize.x - BorderThickness {
-      newVelocity = GLKVector2Make(-newVelocity.x, newVelocity.y)
-      newPosition = GLKVector2Make(viewportSize.x - BorderThickness, newPosition.y)
+      newVelocity = float2(-newVelocity.x, newVelocity.y)
+      newPosition = float2(viewportSize.x - BorderThickness, newPosition.y)
       hitBorder = true
       tumbleDistance = -2 * (ballNode.position.y - viewportSize.y/2) / viewportSize.y
     }
 
     if newPosition.y <= BorderThickness {
-      newVelocity = GLKVector2Make(newVelocity.x, -newVelocity.y)
-      newPosition = GLKVector2Make(newPosition.x, BorderThickness)
+      newVelocity = float2(newVelocity.x, -newVelocity.y)
+      newPosition = float2(newPosition.x, BorderThickness)
       hitBorder = true
       tumbleDistance = -2 * (ballNode.position.x - viewportSize.x/2) / viewportSize.x
     }
     else if newPosition.y >= viewportSize.y {
       // Note: in a real game this would be the game over condition.
 
-      newVelocity = GLKVector2Make(newVelocity.x, -newVelocity.y)
-      newPosition = GLKVector2Make(newPosition.x, viewportSize.y)
+      newVelocity = float2(newVelocity.x, -newVelocity.y)
+      newPosition = float2(newPosition.x, viewportSize.y)
       hitBorder = true
       tumbleDistance = 2 * (ballNode.position.x - viewportSize.x/2) / viewportSize.x
     }
@@ -914,7 +914,7 @@ class ViewController: UIViewController, EngineDelegate {
       if settings.brickScale {
         let tween = tweenPool.scaleToTween()
         tween.target = brickToDestroy
-        tween.amount = PPVector2Zero
+        tween.amount = float2.zero
         tween.duration = settings.brickDestructionDuration
         tween.timingFunction = TimingFunctionQuadraticEaseOut
         tweenPool.add(tween)
@@ -940,7 +940,7 @@ class ViewController: UIViewController, EngineDelegate {
 
         let tween = tweenPool.moveToTween()
         tween.target = brickToDestroy
-        tween.amount = GLKVector2Make(0, viewportSize.y + 100)
+        tween.amount = float2(0, viewportSize.y + 100)
         tween.duration = settings.brickDestructionDuration / 2
         tween.timingFunction = TimingFunctionCubicEaseIn
         tweenPool.add(tween)
@@ -957,14 +957,14 @@ class ViewController: UIViewController, EngineDelegate {
 
         let tweenVertical = tweenPool.moveToTween()
         tweenVertical.target = brickToDestroy
-        tweenVertical.amount = GLKVector2MultiplyScalar(GLKVector2Make(0, ballNode.velocity.y), 0.2)
+        tweenVertical.amount = float2(0, ballNode.velocity.y) * 0.2
         tweenVertical.duration = 0.5
         tweenVertical.timingFunction = TimingFunctionCubicEaseOut
         tweenPool.add(tweenVertical)
 
         let tweenHorizontal = tweenPool.moveToTween()
         tweenHorizontal.target = brickToDestroy
-        tweenHorizontal.amount = GLKVector2MultiplyScalar(GLKVector2Make(ballNode.velocity.x * 0.5, 0), 0.5)
+        tweenHorizontal.amount = float2(ballNode.velocity.x * 0.5, 0) * 0.5
         tweenHorizontal.duration = settings.brickDestructionDuration / 2
         tweenHorizontal.timingFunction = TimingFunctionLinear
         tweenPool.add(tweenHorizontal)
@@ -1000,37 +1000,37 @@ class ViewController: UIViewController, EngineDelegate {
     if settings.gravity > 0 {
       var newY = newVelocity.y + settings.gravity * 200 * dt
       newY = fminf(newY, 400)
-      newVelocity = GLKVector2Make(newVelocity.x, newY)
+      newVelocity = float2(newVelocity.x, newY)
     }
 
     // Stretch the ball depending on its speed
 
-    let newScale: GLKVector2
+    let newScale: float2
     if settings.ballStretch {
       //float length = GLKVector2Length(newVelocity);
       //newScale = GLKVector2Make(1.0f - length/1500.0f, 1.0f + length/1500.0f);
 
       // This makes the effect more pronounced; we're not taking the sqrt(),
       // so larger distances count much stronger than small distances.
-      let lengthSquared = PPVector2LengthSquared(newVelocity)
-      newScale = GLKVector2Make(1 - lengthSquared/500000, 1 + lengthSquared/500000)
+      let lengthSquared = length_squared(newVelocity)
+      newScale = float2(1 - lengthSquared/500000, 1 + lengthSquared/500000)
     }
     else  // no stretching
     {
-      newScale = GLKVector2Make(1, 1)
+      newScale = float2(1, 1)
     }
 
     // We cannot set the new scale directly on the ball because there may be
     // tweens active that also change the scale. Instead, figure out by how
     // much the scale should change and "add" that to the existing scale.
-    let diff = GLKVector2Divide(newScale, ballNode.desiredScale)
+    let diff = newScale / ballNode.desiredScale
     ballNode.desiredScale = newScale
-    ballNode.scale = GLKVector2Multiply(ballNode.scale, diff)
+    ballNode.scale *= diff
 
     // Move the ball
 
     if hitBorder || hitPaddle || hitBrick {
-      hitVector = GLKVector2Normalize(ballNode.velocity)
+      hitVector = normalize(ballNode.velocity)
     }
 
     ballNode.position = newPosition
@@ -1060,7 +1060,7 @@ class ViewController: UIViewController, EngineDelegate {
 
         let tween = tweenPool.scaleFromTween()
         tween.target = ballNode
-        tween.amount = GLKVector2Make(2, 2)
+        tween.amount = float2(2, 2)
         tween.duration = 0.2
         tween.timingFunction = TimingFunctionQuadraticEaseOut
         tween.name = "ballExtraScale"
@@ -1081,14 +1081,14 @@ class ViewController: UIViewController, EngineDelegate {
         tweenPool.remove(forTarget: ballNode, withName: "ballStretchAnimated", finish: true)
 
         let amounts = [
-          GLKVector2Make(1.5, 0.6667),
-          GLKVector2Make(0.9, 1.2),
-          GLKVector2Make(1.5, 0.6667),
-          GLKVector2Make(0.9, 1.2),
-          GLKVector2Make(1.5, 0.6667),
-          GLKVector2Make(0.9, 1.2),
-          GLKVector2Make(1.5, 0.6667),
-          GLKVector2Make(1.0, 1.0),
+          float2(1.5, 0.6667),
+          float2(0.9, 1.2),
+          float2(1.5, 0.6667),
+          float2(0.9, 1.2),
+          float2(1.5, 0.6667),
+          float2(0.9, 1.2),
+          float2(1.5, 0.6667),
+          float2(1.0, 1.0),
         ]
 
         var delay: Float = 0
@@ -1134,7 +1134,7 @@ class ViewController: UIViewController, EngineDelegate {
     if colorGlitchCounter > 0 {
       colorGlitchCounter += 1
       if colorGlitchCounter < 10 {
-        engine.renderingEngine.clearColor = GLKVector4Make(Float.random(), Float.random(), Float.random(), 1)
+        engine.renderingEngine.clearColor = float4(Float.random(), Float.random(), Float.random(), 1)
       } else {
         colorGlitchCounter = 0
         engine.renderingEngine.clearColor = vectorWithRGB(73, 10, 61)

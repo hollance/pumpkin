@@ -140,25 +140,7 @@ public class SpriteBatch: Renderer {
 
     glUseProgram(shaderProgram.programName)
 
-    var m = [Float](count: 16, repeatedValue: 0)
-    m[0] = context.matrix.m00
-    m[1] = context.matrix.m01
-    m[2] = context.matrix.m02
-    m[3] = context.matrix.m03
-    m[4] = context.matrix.m10
-    m[5] = context.matrix.m11
-    m[6] = context.matrix.m12
-    m[7] = context.matrix.m13
-    m[8] = context.matrix.m20
-    m[9] = context.matrix.m21
-    m[10] = context.matrix.m22
-    m[11] = context.matrix.m23
-    m[12] = context.matrix.m30
-    m[13] = context.matrix.m31
-    m[14] = context.matrix.m32
-    m[15] = context.matrix.m33
-
-    glUniformMatrix4fv(GLint(shaderProgram.uniforms.matrix), 1, GLboolean(GL_FALSE), m)
+    glUniformMatrix4fv(GLint(shaderProgram.uniforms.matrix), 1, GLboolean(GL_FALSE), context.matrix.openGLMatrix)
 
     glEnableVertexAttribArray(shaderProgram.attributes.position)
     glEnableVertexAttribArray(shaderProgram.attributes.color)

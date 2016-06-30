@@ -1,4 +1,4 @@
-import GLKit
+import simd
 
 /*
  * Passes around objects needed for rendering.
@@ -10,5 +10,5 @@ public class RenderContext {
 
   /*! The combined projection and modelview matrices for the game world. The 
       renderer may modify this and should always load this into the shader. */
-  public var matrix = GLKMatrix4Identity
+  public var matrix = float4x4.identity
 }

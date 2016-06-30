@@ -1,5 +1,5 @@
 import Foundation
-import GLKit
+import simd
 
 public typealias TweenCompletionBlock = (Void) -> Void
 
@@ -161,19 +161,19 @@ public class BasicTween: Tween {
   back to 0 over time.
 */
 public class MoveFromTween : BasicTween {
-  public var amount = PPVector2Zero
-  private var previousValue = PPVector2Zero
+  public var amount = float2.zero
+  private var previousValue = float2.zero
 
   internal override func start() {
-    previousValue = PPVector2Zero
+    previousValue = float2.zero
   }
 
   internal override func step(t t: Float, target: Tweenable) {
     // Note: The lerp is "s + (0 - s)t" which simplifies to "s(1 - t)".
-    let value = GLKVector2MultiplyScalar(amount, 1 - t)
-    let diff = GLKVector2Subtract(value, previousValue)
+    let value = amount * (1 - t)
+    let diff = value - previousValue
     previousValue = value
-    target.position = GLKVector2Add(target.position, diff)
+    target.position += diff
   }
 }
 
@@ -183,19 +183,19 @@ public class MoveFromTween : BasicTween {
   The start value is 0. Over time the amount of movement is added to it.
 */
 public class MoveToTween : BasicTween {
-  public var amount = PPVector2Zero
-  private var previousValue = PPVector2Zero
+  public var amount = float2.zero
+  private var previousValue = float2.zero
 
   internal override func start() {
-    previousValue = PPVector2Zero
+    previousValue = float2.zero
   }
 
   internal override func step(t t: Float, target: Tweenable) {
     // Note: The lerp is "0 + (e - 0)t" which simplifies to "e*t".
-    let value = GLKVector2MultiplyScalar(amount, t)
-    let diff = GLKVector2Subtract(value, previousValue)
+    let value = amount * t
+    let diff = value - previousValue
     previousValue = value
-    target.position = GLKVector2Add(target.position, diff)
+    target.position += diff
   }
 }
 
@@ -251,19 +251,19 @@ public class RotateToTween : BasicTween {
   back to (1, 1) over time.
 */
 public class ScaleFromTween : BasicTween {
-  public var amount = PPVector2Zero
-  private var previousValue = PPVector2Zero
+  public var amount = float2.zero
+  private var previousValue = float2.zero
 
   internal override func start() {
-    previousValue = GLKVector2Make(1, 1)
+    previousValue = float2(1, 1)
   }
 
   internal override func step(t t: Float, target: Tweenable) {
     // Note: The lerp is "s + (1 - s)*t", which simplifies to "t + s(1 - t)".
-    let value = GLKVector2AddScalar(GLKVector2MultiplyScalar(amount, 1 - t), t)
-    let diff = GLKVector2Divide(value, previousValue)
+    let value = amount * (1 - t) + float2(t, t)
+    let diff = value / previousValue
     previousValue = value
-    target.scale = GLKVector2Multiply(target.scale, diff)
+    target.scale *= diff
   }
 }
 
@@ -274,19 +274,19 @@ public class ScaleFromTween : BasicTween {
   to the amount.
 */
 public class ScaleToTween : BasicTween {
-  public var amount = PPVector2Zero
-  private var previousValue = PPVector2Zero
+  public var amount = float2.zero
+  private var previousValue = float2.zero
 
   internal override func start() {
-    previousValue = GLKVector2Make(1, 1)
+    previousValue = float2(1, 1)
   }
 
   internal override func step(t t: Float, target: Tweenable) {
     // Note: The lerp is "1 + (e - 1)*t", which simplifies to "e*t + 1 - t".
-    let value = GLKVector2AddScalar(GLKVector2MultiplyScalar(amount, t), 1 - t)
-    let diff = GLKVector2Divide(value, previousValue)
+    let value = amount * t + float2(1 - t)
+    let diff = value / previousValue
     previousValue = value
-    target.scale = GLKVector2Multiply(target.scale, diff)
+    target.scale *= diff
   }
 }
 
@@ -301,11 +301,11 @@ public class ScaleToTween : BasicTween {
   active, only the most recent tween you added has any effect.
 */
 public class TintTween : BasicTween {
-  public var startColor = GLKVector4()
-  public var endColor = GLKVector4()
+  public var startColor = float4.zero
+  public var endColor = float4.zero
 
   internal override func step(t t: Float, target: Tweenable) {
-    target.color = GLKVector4Lerp(startColor, endColor, t)
+    target.color = mix(startColor, endColor, t: t)
   }
 }
 

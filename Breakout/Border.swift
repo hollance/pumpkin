@@ -1,17 +1,17 @@
-import GLKit
+import simd
 import Pumpkin
 
 let BorderThickness: Float = 20
 
 class Border: Shape {
-  var color = GLKVector4Make(1, 1, 1, 1) //float4(1, 1, 1, 1)
+  var color = float4(1, 1, 1, 1)
 
   var length: Float = 0 {
     didSet {
-      vertices[0].position = GLKVector2Make(0, 0)
-      vertices[1].position = GLKVector2Make(0, length)
-      vertices[2].position = GLKVector2Make(BorderThickness, 0)
-      vertices[3].position = GLKVector2Make(BorderThickness, length)
+      vertices[0].position = float2(0, 0)
+      vertices[1].position = float2(0, length)
+      vertices[2].position = float2(BorderThickness, 0)
+      vertices[3].position = float2(BorderThickness, length)
     }
   }
 
@@ -44,27 +44,8 @@ class Border: Shape {
       let pointer = UnsafePointer<UInt8>(buf.baseAddress)
       let stride = GLsizei(sizeof(ColoredVertex))
 
-      let matrix = GLKMatrix4Multiply(context.matrix, node!.transform)
-
-      var m = [Float](count: 16, repeatedValue: 0)
-      m[0] = matrix.m00
-      m[1] = matrix.m01
-      m[2] = matrix.m02
-      m[3] = matrix.m03
-      m[4] = matrix.m10
-      m[5] = matrix.m11
-      m[6] = matrix.m12
-      m[7] = matrix.m13
-      m[8] = matrix.m20
-      m[9] = matrix.m21
-      m[10] = matrix.m22
-      m[11] = matrix.m23
-      m[12] = matrix.m30
-      m[13] = matrix.m31
-      m[14] = matrix.m32
-      m[15] = matrix.m33
-
-      glUniformMatrix4fv(GLint(uniforms.matrix), 1, GLboolean(GL_FALSE), m)
+      let matrix = context.matrix * node!.transform
+      glUniformMatrix4fv(GLint(uniforms.matrix), 1, GLboolean(GL_FALSE), matrix.openGLMatrix)
 
       glVertexAttribPointer(shaderProgram.attributes.position, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer)
       glVertexAttribPointer(shaderProgram.attributes.color, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, pointer + 8)
