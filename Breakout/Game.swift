@@ -2,7 +2,7 @@ import UIKit
 import simd
 import Pumpkin
 
-class ViewController: UIViewController, EngineDelegate {
+class Game: UIViewController, EngineDelegate {
   @IBOutlet weak var openGLView: OpenGLView!
 
 	let engine = Engine()
@@ -501,7 +501,7 @@ class ViewController: UIViewController, EngineDelegate {
       tweenTop.target = topBorder
       tweenTop.amount = float2(0, -50)
       tweenTop.duration = settings.tweeningDuration
-      tweenTop.delay = 0.5
+      tweenTop.delay = settings.tweeningDuration// 0.5
       tweenTop.timingFunction = TimingFunctionBounceEaseOut
       tweenPool.add(tweenTop)
 
