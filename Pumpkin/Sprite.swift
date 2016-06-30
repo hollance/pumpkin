@@ -107,29 +107,20 @@ public class Sprite: Visual, Tweenable, Renderer {
     var minY =  Float.infinity
     var maxY = -Float.infinity
 
-//TODO: fix this
-    for i in 0..<4 {
-      var v: TexturedVertex
-      switch i {
-      case 0: v = quad.tl
-      case 1: v = quad.tr
-      case 2: v = quad.br
-      case 3: v = quad.bl
-      default: fatalError("fuck off")
-      }
-
+    func check(v: TexturedVertex) {
       let x = v.position.x
       let y = v.position.y
-
-//      let vertex = quad.vertex[i]
-//      let x = vertex.position.x
-//      let y = vertex.position.y
 
       if x > maxX { maxX = x }
       if x < minX { minX = x }
       if y > maxY { maxY = y }
       if y < minY { minY = y }
     }
+
+    check(quad.tl)
+    check(quad.tr)
+    check(quad.br)
+    check(quad.bl)
 
     return float4(minX, minY, maxX, maxY)
   }
@@ -145,19 +136,11 @@ public class Sprite: Visual, Tweenable, Renderer {
       if self.hidden {
         // This is a quick optimization so not all quads have to be
         // re-ordered if you just want to hide one sprite.
-
         quad.tl.position = float2.zero
         quad.tr.position = float2.zero
         quad.br.position = float2.zero
         quad.bl.position = float2.zero
-
-//        quad.vertex[0].position = GLKVector2Make(0, 0)  //float2()
-//        quad.vertex[1].position = GLKVector2Make(0, 0)  //float2()
-//        quad.vertex[2].position = GLKVector2Make(0, 0)  //float2()
-//        quad.vertex[3].position = GLKVector2Make(0, 0)  //float2()
-      }
-      else
-      {
+      } else {
         // The order of the transforms is as follows:
         //   1. adjust for anchor point
         //   2. scale
@@ -174,11 +157,6 @@ public class Sprite: Visual, Tweenable, Renderer {
         quad.br.position = float2(ax2, ay2)
         quad.bl.position = float2(ax1, ay2)
 
-//        quad.vertex[0].position = GLKVector2Make(ax1, ay1)
-//        quad.vertex[1].position = GLKVector2Make(ax2, ay1)
-//        quad.vertex[2].position = GLKVector2Make(ax2, ay2)
-//        quad.vertex[3].position = GLKVector2Make(ax1, ay2)
-
         let tx1 = flipX ? texCoords.z : texCoords.x
         let ty1 = flipY ? texCoords.w : texCoords.y
         let tx2 = flipX ? texCoords.x : texCoords.z
@@ -188,11 +166,6 @@ public class Sprite: Visual, Tweenable, Renderer {
         quad.tr.texCoord = float2(tx2, ty1)
         quad.br.texCoord = float2(tx2, ty2)
         quad.bl.texCoord = float2(tx1, ty2)
-
-//        quad.vertex[0].texCoord = GLKVector2Make(tx1, ty1)
-//        quad.vertex[1].texCoord = GLKVector2Make(tx2, ty1)
-//        quad.vertex[2].texCoord = GLKVector2Make(tx2, ty2)
-//        quad.vertex[3].texCoord = GLKVector2Make(tx1, ty2)
 
         let transform = node?.transform ?? float4x4.identity
 
@@ -205,51 +178,25 @@ public class Sprite: Visual, Tweenable, Renderer {
 
         let m = transform.openGLMatrix
 
-        for t in 0..<4 {
-          //TODO: kinda lame
-          var v: TexturedVertex
-          switch t {
-          case 0: v = quad.tl
-          case 1: v = quad.tr
-          case 2: v = quad.br
-          case 3: v = quad.bl
-          default: fatalError("fuck off")
-          }
-
+        func process(inout v: TexturedVertex) {
           let x = v.position.x
           let y = v.position.y
 
-//          let x = quad.vertex[t].position.x
-//          let y = quad.vertex[t].position.y
-
-//          quad.vertex[t].position.x = transform[0, 0] * x + transform[1, 0] * y + transform[3, 0]
-//          quad.vertex[t].position.y = transform[0, 1] * x + transform[1, 1] * y + transform[3, 1]
-
-          v.position = float2(
-            m[0] * x + m[4] * y + m[12],
-            m[1] * x + m[5] * y + m[13])
+          v.position.x = m[0] * x + m[4] * y + m[12]
+          v.position.y = m[1] * x + m[5] * y + m[13]
 
           v.r = spriteColor[0]
           v.g = spriteColor[1]
           v.b = spriteColor[2]
           v.a = spriteColor[3]
-
-//          v.color = (UInt32(spriteColor[0]) <<  0) |
-//                    (UInt32(spriteColor[1]) <<  8) |
-//                    (UInt32(spriteColor[2]) << 16) |
-//                    (UInt32(spriteColor[3]) << 24)
-
-          switch t {
-          case 0: quad.tl = v
-          case 1: quad.tr = v
-          case 2: quad.br = v
-          case 3: quad.bl = v
-          default: fatalError("fuck off")
-          }
         }
+
+        process(&quad.tl)
+        process(&quad.tr)
+        process(&quad.br)
+        process(&quad.bl)
       }
     }
-
     return quad
   }
 
@@ -349,28 +296,20 @@ public class Sprite: Visual, Tweenable, Renderer {
     glEnableVertexAttribArray(shaderProgram.attributes.color)
     glEnableVertexAttribArray(shaderProgram.attributes.texCoord)
 
-          // how do I get a pointer to just this variable?
-          // unsafeAddressOf() doesn't seem to work
-//    let pointer = UnsafePointer<Void>(&quad)
+    var quad = texturedQuad
+    let stride = GLsizei(sizeof(TexturedVertex))
+    let indices: [GLushort] = [ 0, 2, 1, 0, 3, 2 ]  // counter-clockwise!
 
-    let quads = [texturedQuad]
+    glVertexAttribPointer(shaderProgram.attributes.position, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, &quad)
+    glVertexAttribPointer(shaderProgram.attributes.texCoord, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, &quad.tl.texCoord )
+    glVertexAttribPointer(shaderProgram.attributes.color, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, &quad.tl.r)
 
-    quads.withUnsafeBufferPointer { buf in
-      let pointer = UnsafePointer<UInt8>(buf.baseAddress)
-      let stride = GLsizei(sizeof(TexturedVertex))
-      let indices: [GLushort] = [ 0, 2, 1, 0, 3, 2 ]  // counter-clockwise!
-
-      glVertexAttribPointer(shaderProgram.attributes.position, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer)
-      glVertexAttribPointer(shaderProgram.attributes.texCoord, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer + 8)
-      glVertexAttribPointer(shaderProgram.attributes.color, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, pointer + 16)
-
-      if let texture = texture {
-        glBlendFunc(texture.premultipliedAlpha ? GLenum(GL_ONE) : GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA))
-        glBindTexture(GLenum(GL_TEXTURE_2D), texture.name)
-      }
-
-      glDrawElements(GLenum(GL_TRIANGLES), 6, GLenum(GL_UNSIGNED_SHORT), indices)
+    if let texture = texture {
+      glBlendFunc(texture.premultipliedAlpha ? GLenum(GL_ONE) : GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA))
+      glBindTexture(GLenum(GL_TEXTURE_2D), texture.name)
     }
+
+    glDrawElements(GLenum(GL_TRIANGLES), 6, GLenum(GL_UNSIGNED_SHORT), indices)
 
     glDisableVertexAttribArray(shaderProgram.attributes.texCoord)
     glDisableVertexAttribArray(shaderProgram.attributes.color)

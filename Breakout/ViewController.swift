@@ -603,7 +603,7 @@ class ViewController: UIViewController, EngineDelegate {
         
         // Make sure the new scale doesn't become too small. If allowed to
         // become 0, the paddle will disappear, never to return.
-        newScale = clamp(newScale, min: float2(0.25, 0.25), max: float2(10.0, 10.0))
+        newScale = clamp(newScale, min: float2(0.5, 0.4), max: float2(10.0, 10.0))
 
         scalePaddle(newScale)
       }

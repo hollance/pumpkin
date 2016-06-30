@@ -195,9 +195,9 @@ extension Settings {
   mutating func customizeEffects() {
     allEffects()
 
-//    musicEnabled = false
-//    maxBalls = 1
-//    ballType = 2
-//    tweenLogo = true
+    musicEnabled = false
+    maxBalls = 1
+    ballType = 2
+    tweenLogo = true
   }
 }

@@ -11,11 +11,35 @@ Pumpkin in Swift + Metal
 -	when starting up, sometimes the bricks don't scale down properly;
 	is this because the ball already hits some bricks and they jelly?
 	(does this happen on the obj-c version too?)
+
+-	clean up the OpenGL shit
+	https://github.com/joshb/CocoaOpenGL-Swift/tree/master/CocoaOpenGL-Swift
+	https://github.com/bradley/iOSSwiftOpenGL
+
+-	RenderingEngine: 
+	-	OpenGL/Metal-specific RenderingEngines? (+ better name for this!)
+	-	don't initialize with OpenGLView? do we need layer + viewportsize?
+	-	better name
+	-	does Engine really need to have a reference to RenderingEngine?
+		or should I let ViewController handle that? (so that we really
+		have a clean split between the scenegraph and the drawing)
+
+-	clean up code: make more Swift-like
+	-	use as few ! and ? as possible...
+	-	Visual has too many properties: Shape doesn't need the ones used by
+		Sprite.
+	-	Tweenable: It now has two sections: for Node and for Sprite
+		-	BasicTween cannot have "target" then; this must be in the
+			subclasses only (don't know if that is a problem)
+		-	maybe PositionTweenable, ScaleTween(able), etc.
+
+-	RenderingEngine and Engine
+-	also on iPhone (just scale from 1024x768 scene to device size?)
 -	add a delay of a second before showing everything
 -	timers: what happens if there is a big shift in system time (because
 	the game was paused etc)? (For Timer this is no problem, but what
 	about times that use CACurrentMediaTime()?)
--	also on iPhone (just scale from 1024x768 scene to device size?)
+-	rename ViewController to Game
 
 -	docs:
 		Juice it or lose it - a talk by Martin Jonasson & Petri Purho (2012)
@@ -25,31 +49,5 @@ Pumpkin in Swift + Metal
 		Ray Wenderlich - Adding Juice to your Games (AltConf 2014)
 		https://www.youtube.com/watch?v=5aGFPpMvILY
 
--	clean up code: make more Swift-like
-	-	clean up the OpenGL shit
-		https://github.com/joshb/CocoaOpenGL-Swift/tree/master/CocoaOpenGL-Swift
-		https://github.com/bradley/iOSSwiftOpenGL
-
--	use as few ! and ? as possible...
--	ShaderAttributes.texCoord.rawValue
--	RenderingEngine: 
-	-	OpenGL/Metal-specific RenderingEngines? (+ better name for this!)
-	-	don't initialize with OpenGLView? do we need layer + viewportsize?
-	-	better name
-	-	does Engine really need to have a reference to RenderingEngine?
-		or should I let ViewController handle that? (so that we really
-		have a clean split between the scenegraph and the drawing)
--	Visual has too many properties: Shape doesn't need the ones used by
-	Sprite.
--	Tweenable: It now has two sections: for Node and for Sprite
-	-	BasicTween cannot have "target" then; this must be in the
-		subclasses only (don't know if that is a problem)
-	-	maybe PositionTweenable, ScaleTween(able), etc.
--	rename ViewController to Game
-
-
+-	TODO
 -	https://developer.apple.com/library/ios/samplecode/MetalBasic3D/Listings/MetalBasic3D_AAPLTransforms_mm.html#//apple_ref/doc/uid/TP40014603-MetalBasic3D_AAPLTransforms_mm-DontLinkElementID_7
--	Sprite: 
-	-	boundingBox
-	-	texturedQuad
-	-	how to get a pointer to just the quad?
