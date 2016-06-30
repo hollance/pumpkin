@@ -1,11 +1,127 @@
 Pumpkin in Swift + Metal
 
+------------------------------------------------------------------------
+
+Possible features:
+
+-	Parallax node (see Platformer Game Starter Kit)
+
+-	Automatic batching for drawing from sprite sheet.
+
+-	Timing functions:
+	-	improve the bezier curve implementation (see Obj-C version):
+		-	in Mozilla Firefox, the bezier curve interpolation is implemented in nsSMILKeySpline.cpp
+		-	see also spine runtime (Animation.c)
+	-	http://www.timotheegroleau.com/Flash/experiments/easing_function_generator.htm
+	-	plot the step(x, n) function in Mathematica
+	-	play with Weighted Average (http://sol.gfxile.net/interpolation/#c7)
+	-	splines: http://sol.gfxile.net/interpolation/
+
+-	Integrate with Box2D. Have a way to attach a physics body to a Node. Also
+	do debug drawing.
+	-	Then rewrite Galaxy Apocalypse using my own engine.
+	-	First with basic demo project.
+
+-	Rendering into a texture:
+	-	http://www.raywenderlich.com/33266/how-to-create-dynamic-textures-with-ccrendertexture-in-cocos2d-2-x
+	-	Also look at Krzysztof's improvements to CCRenderTexture: http://www.cocos2d-iphone.org/foldify/
+
+-	That nudging collision thing from Shaun Inman (Retro Game Crunch primer)
+	http://retrogamecrunch.com/journal/16/cutting-corners
+
+-	Do screen shake by changing the modelviewMatrix of a layer, instead of
+	updating all the nodes in that layer. (Small optimization.)
+	-	also for rotate and zoom
+
+-	Blend mode (on PPSprite is best, probably).
+
+-	Skew effect (see Cocos2D)
+	-	PPNode: @property (nonatomic, assign) GLKVector2 skew;
+
+-	Other Node featyres:
+	- (PPNode *)commonAncestorWith:(PPNode *)otherNode; Finds out which
+		parent node this one and otherNode have in common (or nil if none).
+	- (GLKVector4)boundingBox; method. Unlike the one on PPSprite,
+		this returns the accumulated frame of this node and all its children.
+		So it asks each child node for the bounding box of its visual and then
+		creates a box that encompasses them all (with PPBoxUnion(box1, box2)).
+		-	See also SKNode's calculateAccumulatedFrame
+	- (BOOL)containsPoint:(CGPoint)point; This point must be in the
+		same coordinate space as the node's parent.
+
+-	Conversion methods for coordinate systems:
+	-	Sprite Kit API on SKNode:
+		- (CGPoint)convertPoint:(CGPoint)point fromNode:(SKNode *)node
+		- (CGPoint)convertPoint:(CGPoint)point toNode:(SKNode *)node
+		Both nodes must be part of the same tree. It converts from the coordinate
+		system of one node to the coordinate system of the other.
+	-	Cocos2D API:
+		- (CGPoint)convertToNodeSpace:(CGPoint)worldPoint;
+		- (CGPoint)convertToWorldSpace:(CGPoint)nodePoint;
+		These convert to and from "world space". So instead of converting to 
+		another node's coordinate space, you'd convert both nodes to world space
+		and do your calculations there.
+	-	Maybe on PPNode:
+		- (GLKVector2)convertPoint:(GLKVector2)point toParent:(PPNode *)parent;
+		This walks up to find parent, and get the local transforms of all the
+		underlying parents (but not the top-level parent) and applies them to
+		the point. If parent == node.parent, then don't do anything because the
+		point is already in the direct parent's coordinate system. Assert if the
+		parent isn't actually in the parent hierarchy of the node.
+
+-	Full-featured sprite sheet loading (including trimming and rotation).
+	-	Fallback loading for textures and sprite sheets. If @2x~ipad does not exist,
+		then load regular @2x.
+	-	Support for Sprite Kit texture atlas, so you can use Xcode to generate
+		them.
+
+-	DebugRenderer that draws debug info on the nodes that have it enabled. 
+	It also draws an FPS counter + number of draw calls. All the debug info
+	goes into this "layer", which always lies on top.
+
+-	Bitmap font drawing
+	-	read XML/binary output format from Glyph Designer
+	-	http://www.angelcode.com/products/bmfont/doc/file_format.html
+
+-	Debug drawing from Mike Daley book: drawBox() I think it's called.
+
+------------------------------------------------------------------------
+
+Known bugs:
+	
+-	Collision detection: With brick jelly enabled it is possible to catch the
+	ball in such a way that it stays "stuck" for a while (on any side of the
+	paddle). Because the paddle expands on a hit, the collision response does
+	not move the ball completely outside the paddle so that it still registers
+	as a hit on the next frame even though its direction is reversed. This
+	happens the game checks for collisions against the sprite's bounding box,
+	which becomes larger from the jelly tween. Will not fix because a) you
+	typically wouldn't use the sprite's bounding box for collision detection,
+	but one that doesn't get tweened, and b) it totally depends on the type of
+	game you're making how you want the collision response to work.
+
+-	When the ball hits a brick while they are still tweening at the start of
+	the game, the sizes of the brick sprites may be wrong because the scale
+	tween and brick jelly get in each other's way. Will not fix. (Simple
+	workaround is to disable brick jelly during the initial tween.)
+
+------------------------------------------------------------------------
+
+Cleaning up:
+
 -	add remaining features from original/Cocos2D version
+	-	"brickShatter" option: cut the brick into two parts
 	-	particles
+		-	load Particle Designer files and Sprite Kit particle files
+		-	http://www.raywenderlich.com/38248/opengl-es-particle-system-tutorial-part-2
+		-	http://www.raywenderlich.com/37600/opengl-es-particle-system-tutorial-part-1
 	-	ball trail
 	-	bouncy lines
+		-	Make a generic Shape class that you can add geometry to 
+			(rather than needing to override it).
 
 -	port to Metal (keep OpenGL handy too?)
+	-	https://developer.apple.com/library/ios/samplecode/MetalBasic3D/Listings/MetalBasic3D_AAPLTransforms_mm.html#//apple_ref/doc/uid/TP40014603-MetalBasic3D_AAPLTransforms_mm-DontLinkElementID_7
 	-	how to load textures?
 
 -	when starting up, sometimes the bricks don't scale down properly;
@@ -36,18 +152,8 @@ Pumpkin in Swift + Metal
 -	RenderingEngine and Engine
 -	also on iPhone (just scale from 1024x768 scene to device size?)
 -	add a delay of a second before showing everything
+-	CFTimeInterval/Double stuff
 -	timers: what happens if there is a big shift in system time (because
 	the game was paused etc)? (For Timer this is no problem, but what
 	about times that use CACurrentMediaTime()?)
 -	rename ViewController to Game
-
--	docs:
-		Juice it or lose it - a talk by Martin Jonasson & Petri Purho (2012)
-		https://www.youtube.com/watch?v=Fy0aCDmgnxg
-		https://github.com/grapefrukt/juicy-breakout
-
-		Ray Wenderlich - Adding Juice to your Games (AltConf 2014)
-		https://www.youtube.com/watch?v=5aGFPpMvILY
-
--	TODO
--	https://developer.apple.com/library/ios/samplecode/MetalBasic3D/Listings/MetalBasic3D_AAPLTransforms_mm.html#//apple_ref/doc/uid/TP40014603-MetalBasic3D_AAPLTransforms_mm-DontLinkElementID_7

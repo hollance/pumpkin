@@ -24,14 +24,9 @@ public func pointBoxCollision(box box: float4, inout position: float2, inout vel
 		if oldX < box.x || oldX > box.z {
       velocity.x = -velocity.x
       position.x += velocity.x*dt
-//TODO cleanup
-//			velocity = float2(-velocity.x, velocity.y)
-//			position = float2(position.x + velocity.x*dt, position.y)
 		} else {
       velocity.y = -velocity.y
       position.y += velocity.y*dt
-//			velocity = float2(velocity.x, -velocity.y)
-//			position = float2(position.x , position.y + velocity.y*dt)
 		}
 		return true
 	}

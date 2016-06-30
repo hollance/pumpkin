@@ -1,6 +1,6 @@
 import simd
 
-/*! Manages PPTween objects. */
+/*! Manages Tween objects. */
 public class TweenPool {
   private var recycledTweens: [String: [Tween]] = [:]
 

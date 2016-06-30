@@ -62,30 +62,6 @@ extension float4x4 {
   }
 }
 
-/*
-public func PPVector2LengthSquared(vector: GLKVector2) -> Float {
-	return vector.v.0 * vector.v.0 + vector.v.1 * vector.v.1
-}
-
-/*! Makes sure the length of a vector is not greater than the specified maximum. */
-public func PPVector2ClampLength(vector: GLKVector2, max: Float) -> GLKVector2 {
-	if GLKVector2Length(vector) > max {
-		return GLKVector2MultiplyScalar(GLKVector2Normalize(vector), max)
-	} else {
-		return vector
-  }
-}
-
-/*! Ensures that the individual components of the stay within the range
-    [min..max], inclusive. */
-public func PPVector2Clamp(vector: GLKVector2, min: GLKVector2, max: GLKVector2) -> GLKVector2
-{
-	return GLKVector2Make(
-    fmaxf(fminf(vector.x, max.x), min.x),
-    fmaxf(fminf(vector.y, max.y), min.y))
-}
-*/
-
 /*! Creates and returns a new GLKVector4 using RGB components specified as
     values from 0 to 255. */
 public func vectorWithRGB(r: Int, _ g: Int, _ b: Int) -> float4 {

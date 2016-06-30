@@ -5,7 +5,7 @@ import simd
  */
 public protocol Tweenable: class {
 
-  // Implemented by PPNode
+  // Implemented by Node
 
   /* The position of the node relative to its parent. */
   var position: float2 { get set }
@@ -16,7 +16,7 @@ public protocol Tweenable: class {
   /* The rotation angle of the node in degrees, clockwise. */
   var angle: Float { get set }
 
-  // Implemented by PPSprite
+  // Implemented by Sprite
 
   var color: float4 { get set }
   var alpha: Float { get set }
