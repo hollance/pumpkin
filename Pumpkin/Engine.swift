@@ -5,13 +5,13 @@ public protocol EngineDelegate: class {
   func update(dt: Float)
 }
 
-/*
+/*!
  * The main class. It owns everything else.
  */
 public class Engine {
   public weak var delegate: EngineDelegate?
 
-  /* Whether the engine is currently paused. Default is YES. */
+  /*! Whether the engine is currently paused. Default is true. */
   public var isPaused: Bool = true {
     didSet {
       if isPaused {
@@ -28,7 +28,7 @@ public class Engine {
   /* For returning from the background. */
   private var wasPaused = true
 
-  /* The root of the scene graph. */
+  /*! The root of the scene graph. */
   private(set) public var rootNode = Node()
 
   public var renderingEngine: RenderingEngine!
@@ -47,11 +47,13 @@ public class Engine {
     unregisterBackgroundNotifications()
   }
 
-  /* Call this to clean up properly! */
+  /*! Call this to clean up properly! */
   public func tearDown() {
     // Need this method to avoid a retain cycle with CADisplayLink!
     tearDownDisplayLink()
   }
+
+  // MARK: - Display Link
 
   private func setUpDisplayLink() {
     displayLink = CADisplayLink(target: self, selector: #selector(shouldRedraw))
@@ -92,20 +94,11 @@ public class Engine {
   // MARK: - Background Notifications
 
   private func registerBackgroundNotifications() {
-    NSNotificationCenter.defaultCenter().addObserver(self,
-      selector: #selector(applicationDidBecomeActive),
-      name: UIApplicationDidBecomeActiveNotification,
-      object: nil)
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(applicationDidBecomeActive), name: UIApplicationDidBecomeActiveNotification, object: nil)
 
-    NSNotificationCenter.defaultCenter().addObserver(self,
-      selector: #selector(applicationWillResignActive),
-      name: UIApplicationWillResignActiveNotification,
-      object: nil)
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(applicationWillResignActive), name: UIApplicationWillResignActiveNotification, object: nil)
 
-    NSNotificationCenter.defaultCenter().addObserver(self,
-      selector: #selector(applicationSignificantTimeChange),
-      name: UIApplicationSignificantTimeChangeNotification,
-      object: nil)
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(applicationSignificantTimeChange), name: UIApplicationSignificantTimeChangeNotification, object: nil)
   }
 
   private func unregisterBackgroundNotifications() {

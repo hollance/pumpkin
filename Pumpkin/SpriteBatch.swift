@@ -1,28 +1,29 @@
-//import simd
 import GLKit
 import OpenGLES
 
-/*
- * Draws a set of sprites that all share the same texture in a single draw call.
- *
- * Note: To draw placeholder sprites, set texture to nil and the shader program
- * to the colored shader.
- */
+/*!
+  Draws a set of sprites that all share the same texture in a single draw call.
+*/
 public class SpriteBatch: Renderer {
+
+  /*
+    The Objective-C version had options for:
+    
+     - using VBOs for vertices and indices
+     - using VBOs for indices but not vertices
+     - using VAO in combination with VBO
+
+    However, I've not implemented these options in the Swift version, since I
+    want to port to Metal anyway.
+  */
+
+  /*! Note: To draw placeholder sprites, set texture to nil. This changes the
+      shader program to the colored shader. */
   public var texture: Texture?
 
-//#if PP_USE_VBO
-//	GLuint _vertexBuffer;
-//	GLuint _indexBuffer;
-//	#if PP_USE_VAO
-//	GLuint _VAOname;
-//	#endif
-//#elif PP_USE_VBO_INDICES
-//	GLuint _indexBuffer;
-//#endif
+  private(set) public var sprites: [Sprite] = []
 
   private var maxSprites: Int
-  private(set) public var sprites: [Sprite] = []
   private var quads: ContiguousArray<TexturedQuad>
   private var indices: ContiguousArray<GLushort>
   private var quadCount = 0
@@ -49,118 +50,36 @@ public class SpriteBatch: Renderer {
       indices[i + 4] = v + 3
       indices[i + 5] = v + 2
     }
-
-//#if PP_USE_VBO
-//
-//	glGenBuffers(1, &_vertexBuffer);
-//	glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-//	glBufferData(GL_ARRAY_BUFFER, quadsSize, _quads, GL_DYNAMIC_DRAW);
-//
-//	glGenBuffers(1, &_indexBuffer);
-//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
-//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, _indices, GL_STATIC_DRAW);
-//
-//	free(_indices), _indices = NULL;  // no longer need these
-//
-//	glBindBuffer(GL_ARRAY_BUFFER, 0);
-//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-//
-//	#if PP_USE_VAO
-//	[self setUpVAO];
-//	#endif
-//
-//#elif PP_USE_VBO_INDICES
-//
-//	glGenBuffers(1, &_indexBuffer);
-//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
-//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, _indices, GL_STATIC_DRAW);
-//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-//
-//	free(_indices), _indices = NULL;  // no longer need these
-//
-//#endif
   }
 
-/*
-#if PP_USE_VBO && PP_USE_VAO
-- (void)setUpVAO
-{
-	// With a Vertex Array Object (VAO) you no longer have to call
-	// glVertexAttribPointer() before drawing, but simply bind the
-	// vertex array and then do the draw call.
-
-	glGenVertexArraysOES(1, &_VAOname);
-	glBindVertexArrayOES(_VAOname);
-
-	glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
-
-	glEnableVertexAttribArray(PPShaderAttributePosition);
-	glEnableVertexAttribArray(PPShaderAttributeTexCoord);
-	glEnableVertexAttribArray(PPShaderAttributeColor);
-
-	const GLsizei stride = sizeof(PPTexturedVertex);
-
-	glVertexAttribPointer(PPShaderAttributePosition, 2, GL_FLOAT, GL_FALSE, stride, (const GLvoid *)offsetof(PPTexturedVertex, position));
-	glVertexAttribPointer(PPShaderAttributeTexCoord, 2, GL_FLOAT, GL_FALSE, stride, (const GLvoid *)offsetof(PPTexturedVertex, texCoord));
-	glVertexAttribPointer(PPShaderAttributeColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride, (const GLvoid *)offsetof(PPTexturedVertex, color));
-
-	glBindVertexArrayOES(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-#endif
-
-- (void)dealloc
-{
-#if PP_USE_VBO
-    glDeleteBuffers(1, &_vertexBuffer);
-    glDeleteBuffers(1, &_indexBuffer);
-#endif
-
-#if PP_USE_VAO
-	glDeleteVertexArraysOES(1, &_VAOname);
-#endif
-
-#if PP_USE_VBO_INDICES
-    glDeleteBuffers(1, &_indexBuffer);
-#endif
-
-	free(_quads);
-	free(_indices);
-}
-*/
-
-  // MARK: - Data model
+  // MARK: - Data Model
   
   public func add(sprite: Sprite) {
     insert(sprite, atIndex: sprites.count)
   }
 
   public func insert(sprite: Sprite, atIndex index: Int) {
-    //PPAssert(![_sprites containsObject:sprite], @"Array already contains object");
+    assert(sprites.find(sprite) == nil, "Array already contains object")
     sprites.insert(sprite, atIndex: index)
     sprite.needsRedraw = true
   }
 
   public func remove(sprite: Sprite) {
-    //PPAssert([_sprites containsObject:sprite], @"Array does not contain object");
-    //NSUInteger index = [_sprites indexOfObject:sprite];
+    assert(sprites.find(sprite) != nil, "Array does not contain object")
 
-    sprites.removeObject(sprite)
-
-  /*
+    /*
     // This is a small optimization so we don't have to recalculate all quads
     // whenever a single sprite is removed. Whether this is really worth it
     // remains to be seen. In a game where all sprites bounce around the entire
-    // time, it probably isn't and you might as well use the _forceUpdate flag.
-    NSUInteger count = [_sprites count];
-    if (count > 0 && index < count)
-    {
+    // time, it probably isn't and you might as well use the forceUpdate flag.
+    NSUInteger index = [_sprites indexOfObject:sprite];
+    NSUInteger count = [_sprites count] - 1;
+    if (count > 0 && index < count) {
       memmove(_quads + index, _quads + index + 1, (count - index) * sizeof(PPTexturedQuad));
     }
-  */
+    */
 
+    sprites.removeObject(sprite)
     forceUpdate = true
   }
 
@@ -169,11 +88,9 @@ public class SpriteBatch: Renderer {
     forceUpdate = true
   }
 
-  /* Call this whenever you change the drawOrder property of the sprites. */
+  /*! Call this whenever you change the drawOrder property of the sprites. */
   public func sortSpritesByDrawOrder() {
-    sprites.sortInPlace { sprite1, sprite2 in
-      sprite1.drawOrder <= sprite2.drawOrder
-    }
+    sprites.sortInPlace { $0.drawOrder <= $1.drawOrder }
     forceUpdate = true
   }
 
@@ -194,23 +111,24 @@ public class SpriteBatch: Renderer {
     quadCount = 0
 
     for sprite in sprites {
+      // Does the quad for this sprite need to be updated?
       if forceUpdate || sprite.needsRedraw {
-        //PPLog(@"dirty %@ (%@)", sprite.node.name, NSStringFromGLKVector2(sprite.node.position));
-
         sprite.needsRedraw = false
         quadsDirty = true
         quads[quadCount] = sprite.texturedQuad
-
-        ppDirtyCount += 1
+        debug.dirtyCount += 1
       }
 
+      // Note: even if a sprite does not need to be updated, we still need to
+      // include its quad because we still need to draw it.
       quadCount += 1
+
+      // Because the indices array is precalculated, we shouldn't use more
+      // quads than we have room for.
       if quadCount == maxSprites { break }
     }
 
     forceUpdate = false
-
-    //print("Quad count: \(quadCount)")
   }
 
   private func drawSprites(context: RenderContext) {
@@ -221,17 +139,7 @@ public class SpriteBatch: Renderer {
       shaderProgram = context.coloredShader
     }
 
-    //print("Drawing sprites \(sprites.count), \(quadCount)")
-
     glUseProgram(shaderProgram.programName)
-
-    // TODO: there must be an easier way to use float4x4's elements directly...
-//    var m = [Float](count: 16, repeatedValue: 0)
-//    for i in 0..<4 {
-//      for j in 0..<4 {
-//        m[i + j*4] = context.matrix[i, j]
-//      }
-//    }
 
     var m = [Float](count: 16, repeatedValue: 0)
     m[0] = context.matrix.m00
@@ -251,8 +159,7 @@ public class SpriteBatch: Renderer {
     m[14] = context.matrix.m32
     m[15] = context.matrix.m33
 
-    let uniforms = shaderProgram.uniforms
-    glUniformMatrix4fv(GLint(uniforms.matrix), 1, GLboolean(GL_FALSE), m)
+    glUniformMatrix4fv(GLint(shaderProgram.uniforms.matrix), 1, GLboolean(GL_FALSE), m)
 
     glEnableVertexAttribArray(ShaderAttributes.position.rawValue)
     glEnableVertexAttribArray(ShaderAttributes.color.rawValue)
@@ -263,80 +170,21 @@ public class SpriteBatch: Renderer {
       glBindTexture(GLenum(GL_TEXTURE_2D), texture.name)
     }
 
-//  #if PP_USE_VBO
-//
-//    #if !PP_USE_VAO
-//    const GLsizei stride = sizeof(PPTexturedVertex);
-//
-//    glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
-//
-//    glVertexAttribPointer(PPShaderAttributePosition, 2, GL_FLOAT, GL_FALSE, stride, (const GLvoid *)offsetof(PPTexturedVertex, position));
-//    glVertexAttribPointer(PPShaderAttributeTexCoord, 2, GL_FLOAT, GL_FALSE, stride, (const GLvoid *)offsetof(PPTexturedVertex, texCoord));
-//    glVertexAttribPointer(PPShaderAttributeColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride, (const GLvoid *)offsetof(PPTexturedVertex, color));
-//    #endif
-//
-//    if (_quadsDirty)
-//    {
-//      glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-//      glBufferSubData(GL_ARRAY_BUFFER, 0, _quadCount * sizeof(PPTexturedQuad), _quads);
-//      glBindBuffer(GL_ARRAY_BUFFER, 0);
-//      _quadsDirty = NO;
-//    }
-//
-//    #if PP_USE_VAO
-//    glBindVertexArrayOES(_VAOname);
-//    #endif
-//
-//    glDrawElements(GL_TRIANGLES, _quadCount * 6, GL_UNSIGNED_SHORT, 0);
-//
-//    #if PP_USE_VAO
-//    glBindVertexArrayOES(0);
-//    #else
-//    glBindBuffer(GL_ARRAY_BUFFER, 0);
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-//    #endif
-//
-//  #elif PP_USE_VBO_INDICES
-//
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
-//
-//    const GLvoid *pointer = _quads;
-//    const GLsizei stride = sizeof(PPTexturedVertex);
-//
-//    glVertexAttribPointer(PPShaderAttributePosition, 2, GL_FLOAT, GL_FALSE, stride, pointer + offsetof(PPTexturedVertex, position));
-//    glVertexAttribPointer(PPShaderAttributeTexCoord, 2, GL_FLOAT, GL_FALSE, stride, pointer + offsetof(PPTexturedVertex, texCoord));
-//    glVertexAttribPointer(PPShaderAttributeColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride, pointer + offsetof(PPTexturedVertex, color));
-//
-//    glDrawElements(GL_TRIANGLES, _quadCount * 6, GL_UNSIGNED_SHORT, 0);
-//
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-//
-//  #else
-
-//    print("--------------------")
-//    for q in 0..<quadCount {
-//      print("QUAD \(q):\n")
-//      print(quads[q])
-//    }
-
-    quads.withUnsafeBufferPointer { buf in
-      let pointer = UnsafePointer<UInt8>(buf.baseAddress)
+    quads.withUnsafeBufferPointer { qbuf in
+      let pointer = UnsafePointer<UInt8>(qbuf.baseAddress)
       let stride = GLsizei(sizeof(TexturedVertex))
 
-      glVertexAttribPointer(ShaderAttributes.position.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer /*+ offsetof(TexturedVertex, position)*/)
-      glVertexAttribPointer(ShaderAttributes.texCoord.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer + 8 /*offsetof(TexturedVertex, texCoord)*/)
-      glVertexAttribPointer(ShaderAttributes.color.rawValue, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, pointer + 16 /*offsetof(TexturedVertex, color)*/)
+      glVertexAttribPointer(ShaderAttributes.position.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer)
+      glVertexAttribPointer(ShaderAttributes.texCoord.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer + 8)
+      glVertexAttribPointer(ShaderAttributes.color.rawValue, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, pointer + 16)
 
       indices.withUnsafeBufferPointer { ibuf in
         glDrawElements(GLenum(GL_TRIANGLES), Int32(quadCount) * 6, GLenum(GL_UNSIGNED_SHORT), ibuf.baseAddress)
       }
     }
 
-//  #endif
-
-    ppDrawCalls += 1
-    ppTriangleCount += quadCount * 2
+    debug.drawCalls += 1
+    debug.triangleCount += quadCount * 2
 
     glDisableVertexAttribArray(ShaderAttributes.texCoord.rawValue)
     glDisableVertexAttribArray(ShaderAttributes.color.rawValue)
@@ -344,6 +192,6 @@ public class SpriteBatch: Renderer {
 
     glBindTexture(GLenum(GL_TEXTURE_2D), 0)
 
-    PPLogGLError()  
+    logOpenGLError()
   }
 }

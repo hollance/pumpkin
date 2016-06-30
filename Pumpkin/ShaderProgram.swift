@@ -11,13 +11,11 @@ public struct ShaderUniforms {
   public var sampler: GLuint = 0
 }
 
-/*
- * Encapsulates a shader program consisting of a vertex and fragment shader.
- */
+/*! Encapsulates a shader program consisting of a vertex and fragment shader. */
 public class ShaderProgram {
 
-  public var programName: GLuint = 0
-  public var uniforms = ShaderUniforms()
+  private(set) public var programName: GLuint = 0
+  private(set) public var uniforms = ShaderUniforms()
 
   public init(vertexSource: String, fragmentSource: String) {
 		let vertexShader = compileShaderOfType(GLenum(GL_VERTEX_SHADER), fromSource: vertexSource)
@@ -31,7 +29,7 @@ public class ShaderProgram {
       uniforms.sampler = GLuint(result)
     }
 
-		PPLogGLError()
+    logOpenGLError()
   }
 
   deinit {

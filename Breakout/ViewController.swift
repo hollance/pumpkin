@@ -1,26 +1,18 @@
 import UIKit
-//import simd
 import GLKit
 import Pumpkin
 
 class ViewController: UIViewController, EngineDelegate {
-//  @IBOutlet weak var metalView: MetalView!
   @IBOutlet weak var openGLView: OpenGLView!
-
-	/* By how much to speed up or slow down the time. */
-  var timeScale: Float = 1.0
-  //TODO: don't need this, just read from Settings
 
 	let engine = Engine()
 
-  let renderQueue = RenderQueue()   // TODO: RenderingEngine already has one, so don't need to make a new instance
   var tweenPool = TweenPool()
   var timerPool = TimerPool()
 	let spriteBatch = SpriteBatch()
   var spriteSheet: SpriteSheet!
-  var viewportSize = CGSize.zero    //TODO: make this a float2()???
+  var viewportSize = PPVector2Zero
 
-  var logoNode = Node()
   var logoTexture: Texture!
 
   var worldNode: Node!
@@ -103,11 +95,10 @@ class ViewController: UIViewController, EngineDelegate {
     engine.delegate = self
 
     let renderingEngine = RenderingEngine(view: openGLView)
-    renderingEngine.renderQueue = renderQueue
     engine.renderingEngine = renderingEngine
     viewportSize = renderingEngine.viewportSize
 
-    //NSString *filename = PPResourceFilename(@"Sprites");
+    // TODO: choose filename based on device type?
     let filename = "Sprites@2x"
     spriteSheet = SpriteSheet(filename: filename)
 
@@ -123,8 +114,6 @@ class ViewController: UIViewController, EngineDelegate {
     // Draw the first frame, or the screen will flash briefly at startup.
     engine.rootNode.visit(false)
     engine.renderingEngine.render()
-
-    PPLogGLError()
   }
 
   func setUpSound() {
@@ -143,22 +132,22 @@ class ViewController: UIViewController, EngineDelegate {
   }
 
   func restartGame() {
-    renderQueue.removeAllRenderers()
+    engine.renderingEngine.renderQueue.removeAllRenderers()
     spriteBatch.removeAllSprites()
-    tweenPool.removeAllTweensWithFinish(false)
+    tweenPool.removeAllTweens(finish: false)
     timerPool.cancelAllTimers()
     engine.rootNode.removeAllChildren()
 
     worldNode = Node()
     engine.rootNode.add(worldNode)
 
-    renderQueue.add(spriteBatch)
+    engine.renderingEngine.renderQueue.add(spriteBatch)
 
     // Position the root node in the center of the screen, so we can rotate
     // the world around that. But we still want the top-left corner of the
     // world in the top-left corner of the screen, so move the world node back.
     engine.rootNode.angle = 0
-    engine.rootNode.position = GLKVector2Make(Float(viewportSize.width/2), Float(viewportSize.height)/2)
+    engine.rootNode.position = GLKVector2Make(viewportSize.x/2, viewportSize.y/2)
     worldNode.position = GLKVector2Negate(engine.rootNode.position)
 
     setUpPaddle()
@@ -180,18 +169,18 @@ class ViewController: UIViewController, EngineDelegate {
     paddleScale = GLKVector2Make(1, 1)
 
     let paddleSprite = Sprite()
-    paddleSprite.spriteFrame = spriteSheet.spriteFrameNamed("Paddle")
+    paddleSprite.spriteFrame = spriteSheet["Paddle"]
     paddleSprite.drawOrder = 100
     spriteBatch.add(paddleSprite)
 
     paddleNode = Node()
-    paddleNode.position = GLKVector2Make(Float(viewportSize.width/2), Float(viewportSize.height) - 60)
+    paddleNode.position = GLKVector2Make(viewportSize.x/2, viewportSize.y - 60)
     paddleNode.visual = paddleSprite
     paddleNode.name = "Paddle"
     worldNode.add(paddleNode)
 	
     let leftEyeSprite = Sprite()
-    leftEyeSprite.spriteFrame = spriteSheet.spriteFrameNamed("Eye")
+    leftEyeSprite.spriteFrame = spriteSheet["Eye"]
     leftEyeSprite.drawOrder = paddleSprite.drawOrder + 1
     spriteBatch.add(leftEyeSprite)
 
@@ -201,7 +190,7 @@ class ViewController: UIViewController, EngineDelegate {
     paddleNode.add(leftEyeNode)
 
     let rightEyeSprite = Sprite()
-    rightEyeSprite.spriteFrame = spriteSheet.spriteFrameNamed("Eye")
+    rightEyeSprite.spriteFrame = spriteSheet["Eye"]
     rightEyeSprite.drawOrder = paddleSprite.drawOrder + 1
     spriteBatch.add(rightEyeSprite)
 
@@ -211,7 +200,7 @@ class ViewController: UIViewController, EngineDelegate {
     paddleNode.add(rightEyeNode)
 
     let mouthSprite = Sprite()
-    mouthSprite.spriteFrame = spriteSheet.spriteFrameNamed("Mouth")
+    mouthSprite.spriteFrame = spriteSheet["Mouth"]
     mouthSprite.drawOrder = paddleSprite.drawOrder + 1
     spriteBatch.add(mouthSprite)
 
@@ -226,8 +215,8 @@ class ViewController: UIViewController, EngineDelegate {
 
   func setUpBorders() {
     let leftBorderShape = Border()
-    leftBorderShape.length = Float(viewportSize.height)
-    renderQueue.add(leftBorderShape)
+    leftBorderShape.length = viewportSize.y
+    engine.renderingEngine.renderQueue.add(leftBorderShape)
 
     leftBorder = Node()
     leftBorder.position = GLKVector2Make(0, 0)
@@ -237,19 +226,19 @@ class ViewController: UIViewController, EngineDelegate {
     worldNode.add(leftBorder)
 
     let rightBorderShape = Border()
-    rightBorderShape.length = Float(viewportSize.height)
-    renderQueue.add(rightBorderShape)
+    rightBorderShape.length = viewportSize.y
+    engine.renderingEngine.renderQueue.add(rightBorderShape)
 
     rightBorder = Node()
-    rightBorder.position = GLKVector2Make(Float(viewportSize.width), Float(viewportSize.height))
+    rightBorder.position = GLKVector2Make(viewportSize.x, viewportSize.y)
     rightBorder.angle = 180
     rightBorder.visual = rightBorderShape
     rightBorder.name = "Right Border"
     worldNode.add(rightBorder)
 
     let topBorderShape = Border()
-    topBorderShape.length = Float(viewportSize.width)
-    renderQueue.add(topBorderShape)
+    topBorderShape.length = viewportSize.x
+    engine.renderingEngine.renderQueue.add(topBorderShape)
 
     topBorder = Node()
     topBorder.position = GLKVector2Make(0, BorderThickness)
@@ -265,30 +254,30 @@ class ViewController: UIViewController, EngineDelegate {
     for j in 0..<8 {
       for i in 0..<9 {
         let brickSprite = Sprite()
-        brickSprite.spriteFrame = spriteSheet.spriteFrameNamed("Brick")
+        brickSprite.spriteFrame = spriteSheet["Brick"]
         spriteBatch.add(brickSprite)
         
         brickSprite.flipX = (i % 3 == 0)
         brickSprite.flipY = (j % 2 == 0)
 
-        /*
-        // For testing PPAnimation's sprite frame-based animation.
+        /**/
+        // For testing Animation's sprite frame-based animation.
         if i == 0 && j == 0 {
-          let anim = Animation()
+          var anim = Animation()
           anim.spriteFrames = [
-            spriteSheet.spriteFrameNamed("Brick")!,
-            spriteSheet.spriteFrameNamed("Paddle")!,
-            spriteSheet.spriteFrameNamed("BallRound")!,
-            spriteSheet.spriteFrameNamed("BallBowling")!,
-            spriteSheet.spriteFrameNamed("BallSquare")!,
+            spriteSheet["Brick"]!,
+            spriteSheet["Paddle"]!,
+            spriteSheet["BallRound"]!,
+            spriteSheet["BallBowling"]!,
+            spriteSheet["BallSquare"]!,
             ]
           anim.timePerFrame = 0.4
-          anim.loops = 5
+          anim.loops = -1 //5
           anim.restoreOriginalFrame = true
           brickSprite.add(anim, withName: "TestAnim")
           brickSprite.playAnimation("TestAnim", fromFrame: 3)
         }
-        */
+        /**/
         
         let brickNode = Node()
         brickNode.position = GLKVector2Make(152 + Float(i)*90, 90 + Float(j)*40)
@@ -300,8 +289,8 @@ class ViewController: UIViewController, EngineDelegate {
         if i == 0 && j == 7 {
           let placeholderSprite = Sprite()
           placeholderSprite.placeholderContentSize = brickSprite.contentSize
-          placeholderSprite.color = PPVector4WithRGB(255, 255, 0)
-          renderQueue.insert(placeholderSprite, atIndex: 0)
+          placeholderSprite.color = vectorWithRGB(255, 255, 0)
+          engine.renderingEngine.renderQueue.insert(placeholderSprite, atIndex: 0)
 
           let placeholderNode = Node()
           placeholderNode.position = brickNode.position
@@ -332,7 +321,7 @@ class ViewController: UIViewController, EngineDelegate {
     addBall()
 
     if balls.count < settings.maxBalls {
-      timerPool.afterDelay(0.5 + PPRandomFloat() * 3, perform: addExtraBall)
+      timerPool.afterDelay(0.5 + Float.random() * 3, perform: addExtraBall)
     }
   }
 
@@ -347,12 +336,12 @@ class ViewController: UIViewController, EngineDelegate {
     }
 
     let ballSprite = Sprite()
-    ballSprite.spriteFrame = spriteSheet.spriteFrameNamed(spriteName)
+    ballSprite.spriteFrame = spriteSheet[spriteName]
     ballSprite.drawOrder = 200
     spriteBatch.add(ballSprite)
 
     let ballNode = Ball()
-    ballNode.position = GLKVector2Make(Float(viewportSize.width / 2), Float(viewportSize.height) - 220)
+    ballNode.position = GLKVector2Make(viewportSize.x / 2, viewportSize.y - 220)
     ballNode.visual = ballSprite
     ballNode.name = "Ball"
     worldNode.add(ballNode)
@@ -361,54 +350,55 @@ class ViewController: UIViewController, EngineDelegate {
 
     // Assign a random angle to the ball's velocity
     let ballSpeed: Float = 400
-    let angle: Float = GLKMathDegreesToRadians(PPRandomFloat() * 360)
+    let angle: Float = (Float.random() * 360).degreesToRadians()
     ballNode.velocity = GLKVector2Make(cosf(angle)*ballSpeed, sinf(angle)*ballSpeed)
   }
+
+  // MARK: - Settings
 
   func applySettings() {
     applyColorSettings()
     applyMusicSettings()
     applyFaceSettings()
-    timeScale = settings.timeScale
   }
 
   func applyColorSettings() {
     if settings.colorEnabled {
-      engine.renderingEngine.clearColor = PPVector4WithRGB(73, 10, 61)
+      engine.renderingEngine.clearColor = vectorWithRGB(73, 10, 61)
 
-      paddleNode.sprite?.color = PPVector4WithRGB(233, 127, 2)
+      paddleNode.sprite.color = vectorWithRGB(233, 127, 2)
       
       for ballNode in balls {
-        ballNode.sprite?.color = PPVector4WithRGB(248, 202, 0)
+        ballNode.sprite.color = vectorWithRGB(248, 202, 0)
       }
 
-      let borderColor = PPVector4WithRGB(189, 21, 80)
-      (topBorder?.shape as! Border).color = borderColor
-      (leftBorder?.shape as! Border).color = borderColor
-      (rightBorder?.shape as! Border).color = borderColor
+      let borderColor = vectorWithRGB(189, 21, 80)
+      (topBorder.shape as! Border).color = borderColor
+      (leftBorder.shape as! Border).color = borderColor
+      (rightBorder.shape as! Border).color = borderColor
 
       for brickNode in bricks {
-        brickNode.sprite?.color = borderColor
+        brickNode.sprite.color = borderColor
       }
     }
     else
     {
-      engine.renderingEngine.clearColor = PPVector4WithRGB(0, 0, 0)
+      engine.renderingEngine.clearColor = vectorWithRGB(0, 0, 0)
 
-      let whiteColor = PPVector4WithRGB(255, 255, 255)
+      let whiteColor = vectorWithRGB(255, 255, 255)
 
-      paddleNode.sprite?.color = whiteColor
+      paddleNode.sprite.color = whiteColor
 
       for ballNode in balls {
-        ballNode.sprite?.color = whiteColor
+        ballNode.sprite.color = whiteColor
       }
 
-      (topBorder?.shape as! Border).color = whiteColor
-      (leftBorder?.shape as! Border).color = whiteColor
-      (rightBorder?.shape as! Border).color = whiteColor
+      (topBorder.shape as! Border).color = whiteColor
+      (leftBorder.shape as! Border).color = whiteColor
+      (rightBorder.shape as! Border).color = whiteColor
 
       for brickNode in bricks {
-        brickNode.sprite?.color = whiteColor
+        brickNode.sprite.color = whiteColor
       }
     }
   }
@@ -423,13 +413,13 @@ class ViewController: UIViewController, EngineDelegate {
 
   func applyFaceSettings() {
     if settings.paddleFace {
-      leftEyeNode.sprite?.hidden = false
-      rightEyeNode.sprite?.hidden = false
-      mouthNode.sprite?.hidden = false
+      leftEyeNode.sprite.hidden = false
+      rightEyeNode.sprite.hidden = false
+      mouthNode.sprite.hidden = false
     } else {
-      leftEyeNode.sprite?.hidden = true
-      rightEyeNode.sprite?.hidden = true
-      mouthNode.sprite?.hidden = true
+      leftEyeNode.sprite.hidden = true
+      rightEyeNode.sprite.hidden = true
+      mouthNode.sprite.hidden = true
     }
 
     leftEyeNode.position = GLKVector2Make(-settings.paddleEyeSeparation, -2)
@@ -448,7 +438,7 @@ class ViewController: UIViewController, EngineDelegate {
     nodes.append(paddleNode)
 
     for node in nodes {
-      var delay = settings.tweeningDelay * PPRandomFloat()
+      var delay = settings.tweeningDelay * Float.random()
 
       if node === paddleNode {  // I like the look of this better
         delay = 0
@@ -457,7 +447,7 @@ class ViewController: UIViewController, EngineDelegate {
       if settings.tweenYPosition {
         let tween = tweenPool.moveFromTween()
         tween.target = node
-        tween.amount = GLKVector2Make(0, Float(-viewportSize.height*0.8))
+        tween.amount = GLKVector2Make(0, -viewportSize.y*0.8)
         tween.duration = settings.tweeningDuration
         tween.delay = delay
         tween.timingFunction = timingFunction()
@@ -467,7 +457,7 @@ class ViewController: UIViewController, EngineDelegate {
       if settings.tweenRotation {
         let tween = tweenPool.rotateFromTween()
         tween.target = node
-        tween.amount = -45 + PPRandomFloat() * 90
+        tween.amount = -45 + Float.random() * 90
         tween.duration = settings.tweeningDuration
         tween.delay = delay
         tween.timingFunction = timingFunction()
@@ -485,7 +475,7 @@ class ViewController: UIViewController, EngineDelegate {
       }
 
       if settings.tweenAlpha {
-        node.sprite!.alpha = 0
+        node.sprite.alpha = 0
 
         let tween = tweenPool.fadeTween()
         tween.target = node.sprite
@@ -527,16 +517,16 @@ class ViewController: UIViewController, EngineDelegate {
     if settings.tweenLogo {
       let logoSprite = Sprite()
       logoSprite.texture = logoTexture
-      renderQueue.add(logoSprite)
+      engine.renderingEngine.renderQueue.add(logoSprite)
 
-      logoNode = Node()
+      let logoNode = Node()
       logoNode.visual = logoSprite
-      logoNode.position = GLKVector2Make(0, Float(viewportSize.height/2) + logoTexture.contentSize.y/2)
+      logoNode.position = GLKVector2Make(0, viewportSize.y/2 + logoTexture.contentSize.y/2)
       engine.rootNode.add(logoNode)
 
       let moveTween = tweenPool.moveToTween()
       moveTween.target = logoNode
-      moveTween.amount = GLKVector2Make(0, -(Float(viewportSize.height) + logoTexture.contentSize.y)/2)
+      moveTween.amount = GLKVector2Make(0, -(viewportSize.y + logoTexture.contentSize.y)/2)
       moveTween.duration = 2
       moveTween.delay = 1
       moveTween.timingFunction = TimingFunctionExponentialEaseOut
@@ -568,8 +558,8 @@ class ViewController: UIViewController, EngineDelegate {
       tweenPool.add(fadeTween)
 
       timerPool.afterDelay(4) {
-        self.renderQueue.remove(self.logoNode.sprite!)
-        self.logoNode.removeFromParent()
+        self.engine.renderingEngine.renderQueue.remove(logoNode.sprite)
+        logoNode.removeFromParent()
       }
     }
   }
@@ -606,7 +596,7 @@ class ViewController: UIViewController, EngineDelegate {
       let deltaX = Float(newLocation.x - previousTouchLocation.x)
       previousTouchLocation = newLocation
 
-      let newX = fclampf(paddleNode.position.x + deltaX, BorderThickness + 65, Float(viewportSize.width) - BorderThickness - 65)
+      let newX = fclampf(paddleNode.position.x + deltaX, min: BorderThickness + 65, max: viewportSize.x - BorderThickness - 65)
       paddleNode.position = GLKVector2Make(newX, paddleNode.position.y)
 
       if settings.paddleStretch {
@@ -614,7 +604,7 @@ class ViewController: UIViewController, EngineDelegate {
         
         // Make sure the new scale doesn't become too small. If allowed to
         // become 0, the paddle will disappear, never to return.
-        newScale = PPVector2Clamp(newScale, GLKVector2Make(0.25, 0.25), GLKVector2Make(10.0, 10.0))
+        newScale = PPVector2Clamp(newScale, min: GLKVector2Make(0.25, 0.25), max: GLKVector2Make(10.0, 10.0))
 
         scalePaddle(newScale)
       }
@@ -648,7 +638,7 @@ class ViewController: UIViewController, EngineDelegate {
     // Make time go faster or slower. If dt is too small then skip this frame,
     // or risk dividing by 0!
     var dt = dt
-    dt *= timeScale
+    dt *= settings.timeScale
     if dt < FLT_EPSILON { return }
 
     hitBorder = false
@@ -698,31 +688,31 @@ class ViewController: UIViewController, EngineDelegate {
           tween.target = brickNode
           tween.amount = GLKVector2Make(1.15, 1.15)
           tween.duration = 0.5
-          tween.timingFunction = TimingFunctionBounceEaseOut;
+          tween.timingFunction = TimingFunctionBounceEaseOut
           tween.name = "brickJelly"
           tweenPool.replace(tween, finish: false)
         }
       }
 
       if settings.screenShakeEnabled {
-        tweenPool.screenShakeWithNode(worldNode,
+        tweenPool.screenShake(node: worldNode,
           amount: GLKVector2MultiplyScalar(hitVector, settings.screenShakePower),
           oscillations: 10,
           duration: settings.screenShakeDuration)
       
-        tweenPool.screenShakeWithNode(paddleNode,
+        tweenPool.screenShake(node: paddleNode,
           amount: GLKVector2Make(0, hitVector.y * settings.screenShakePower * -1.5),
           oscillations: 10,
           duration: settings.screenShakeDuration)
       }
 
       if settings.screenTumbleEnabled {
-        let angle = GLKMathDegreesToRadians(settings.screenShakePower * 4) * tumbleDistance
-        tweenPool.screenTumbleWithNode(engine.rootNode, angle: angle, oscillations: 10, duration: settings.screenShakeDuration)
+        let angle = (settings.screenShakePower * 4).degreesToRadians() * tumbleDistance
+        tweenPool.screenTumble(node: engine.rootNode, angle: angle, oscillations: 10, duration: settings.screenShakeDuration)
       }
 
       if settings.screenZoomEnabled {
-        tweenPool.screenZoomWithNode(engine.rootNode,
+        tweenPool.screenZoom(node: engine.rootNode,
           amount: GLKVector2Make(1.05, 1.05),
           oscillations: 10,
           duration: settings.screenShakeDuration)
@@ -748,33 +738,24 @@ class ViewController: UIViewController, EngineDelegate {
     if let placeholderNode = worldNode.childNode(withName: "Placeholder") {
       if let brickSprite = placeholderNode.userData as? Sprite {
         placeholderNode.position = brickSprite.node!.position
-        placeholderNode.sprite!.hidden = brickSprite.hidden
+        placeholderNode.sprite.hidden = brickSprite.hidden
         let boundingBox = brickSprite.boundingBox
-        //NSLog(@"boundingBox: %@", NSStringFromPPBox(boundingBox));
-        placeholderNode.sprite!.placeholderContentSize = GLKVector2Make(PPBoxWidth(boundingBox), PPBoxHeight(boundingBox))
+        placeholderNode.sprite.placeholderContentSize = GLKVector2Make(boxWidth(boundingBox), boxHeight(boundingBox))
       }
     }
   }
 
   func updatePaddle(dt: Float) {
     let firstBall = balls[0]
-    var deltaY: Float = 0
-    var deltaX: Float = 0
-
-    //if (firstBall != nil)
-    //{
-      deltaX = paddleNode.position.x - firstBall.position.x
-      deltaY = paddleNode.position.y - firstBall.position.y
-    //}
+    let deltaX = paddleNode.position.x - firstBall.position.x
+    let deltaY = paddleNode.position.y - firstBall.position.y
 
     // Open mouth
 
     var mouthScaleY: Float = 1
-    let halfHeight = Float(viewportSize.height / 2)
+    let halfHeight = viewportSize.y / 2
     if deltaY < halfHeight {
-      if !happy {
-        mouthScaleY = 0.2 * settings.paddleMouthScale
-      }
+      if !happy { mouthScaleY = 0.2 * settings.paddleMouthScale }
       mouthNode.angle = 0
     } else {
       happy = false
@@ -783,20 +764,20 @@ class ViewController: UIViewController, EngineDelegate {
     }
 
     mouthNode.scale = GLKVector2Make(mouthNode.scale.x, mouthScaleY)
-    mouthNode.sprite?.hidden = (settings.paddleMouthScale == 0)
+    mouthNode.sprite.hidden = (settings.paddleMouthScale == 0)
 
     // Look at the ball
 
     if settings.paddleLookAtBall {
       // Cross-eyed
-      //float deltaX = firstBall.position.x - _leftEyeNode.position.x;
-      //float deltaY = firstBall.position.y - _leftEyeNode.position.y;
-      leftEyeNode.angle = GLKMathRadiansToDegrees(atan2f(deltaY, deltaX)) - 90
+      //var deltaX = firstBall.position.x - leftEyeNode.position.x
+      //var deltaY = firstBall.position.y - leftEyeNode.position.y
+      leftEyeNode.angle = (atan2f(deltaY, deltaX)).radiansToDegrees() - 90
 
       // Cross-eyed
-      //deltaX = firstBall.position.x - _rightEyeNode.position.x;
-      //deltaY = firstBall.position.y - _rightEyeNode.position.y;
-      rightEyeNode.angle = GLKMathRadiansToDegrees(atan2f(deltaY, deltaX)) - 90
+      //deltaX = firstBall.position.x - rightEyeNode.position.x
+      //deltaY = firstBall.position.y - rightEyeNode.position.y
+      rightEyeNode.angle = (atan2f(deltaY, deltaX)).radiansToDegrees() - 90
     } else {
       leftEyeNode.angle = 0
       rightEyeNode.angle = 0
@@ -807,11 +788,11 @@ class ViewController: UIViewController, EngineDelegate {
     let now = CACurrentMediaTime()
     if now >= nextBlinkTime {
       blinkOn = !blinkOn
-      nextBlinkTime = now + (blinkOn ? CFTimeInterval(1 + PPRandomFloat() * 2) : 0.1)
+      nextBlinkTime = now + (blinkOn ? CFTimeInterval(1 + Float.random() * 2) : 0.1)
     }
 
-    leftEyeNode.sprite?.hidden = !blinkOn
-    rightEyeNode.sprite?.hidden = !blinkOn
+    leftEyeNode.sprite.hidden = !blinkOn
+    rightEyeNode.sprite.hidden = !blinkOn
   }
 
   func updateBall(ballNode: Ball, deltaTime dt: Float) {
@@ -830,28 +811,28 @@ class ViewController: UIViewController, EngineDelegate {
       newVelocity = GLKVector2Make(-newVelocity.x, newVelocity.y)
       newPosition = GLKVector2Make(BorderThickness, newPosition.y)
       hitBorder = true
-      tumbleDistance = 2 * (ballNode.position.y - Float(viewportSize.height/2)) / Float(viewportSize.height)
+      tumbleDistance = 2 * (ballNode.position.y - viewportSize.y/2) / viewportSize.y
     }
-    else if newPosition.x >= Float(viewportSize.width) - BorderThickness {
+    else if newPosition.x >= viewportSize.x - BorderThickness {
       newVelocity = GLKVector2Make(-newVelocity.x, newVelocity.y)
-      newPosition = GLKVector2Make(Float(viewportSize.width) - BorderThickness, newPosition.y)
+      newPosition = GLKVector2Make(viewportSize.x - BorderThickness, newPosition.y)
       hitBorder = true
-      tumbleDistance = -2 * (ballNode.position.y - Float(viewportSize.height/2)) / Float(viewportSize.height)
+      tumbleDistance = -2 * (ballNode.position.y - viewportSize.y/2) / viewportSize.y
     }
 
     if newPosition.y <= BorderThickness {
       newVelocity = GLKVector2Make(newVelocity.x, -newVelocity.y)
       newPosition = GLKVector2Make(newPosition.x, BorderThickness)
       hitBorder = true
-      tumbleDistance = -2 * (ballNode.position.x - Float(viewportSize.width/2)) / Float(viewportSize.width)
+      tumbleDistance = -2 * (ballNode.position.x - viewportSize.x/2) / viewportSize.x
     }
-    else if newPosition.y >= Float(viewportSize.height) {
+    else if newPosition.y >= viewportSize.y {
       // Note: in a real game this would be the game over condition.
 
       newVelocity = GLKVector2Make(newVelocity.x, -newVelocity.y)
-      newPosition = GLKVector2Make(newPosition.x, Float(viewportSize.height))
+      newPosition = GLKVector2Make(newPosition.x, viewportSize.y)
       hitBorder = true
-      tumbleDistance = 2 * (ballNode.position.x - Float(viewportSize.width/2)) / Float(viewportSize.width)
+      tumbleDistance = 2 * (ballNode.position.x - viewportSize.x/2) / viewportSize.x
     }
 
     if hitBorder {
@@ -865,7 +846,7 @@ class ViewController: UIViewController, EngineDelegate {
     // Check for collision with the paddle
 
     var hitPaddle = false
-    if PPPointBoxCollision(paddleNode.sprite!.boundingBox, position: &newPosition, velocity: &newVelocity, dt: dt)  {
+    if pointBoxCollision(box: paddleNode.sprite.boundingBox, position: &newPosition, velocity: &newVelocity, dt: dt)  {
       hitPaddle = true
 
       if settings.soundPaddle {
@@ -901,7 +882,7 @@ class ViewController: UIViewController, EngineDelegate {
     var brickToDestroy: Node?
 
     for brickNode in bricks {
-      if PPPointBoxCollision(brickNode.sprite!.boundingBox, position: &newPosition, velocity: &newVelocity, dt: dt) {
+      if pointBoxCollision(box: brickNode.sprite.boundingBox, position: &newPosition, velocity: &newVelocity, dt: dt) {
         hitBrick = true
 
         if settings.soundBrick {
@@ -926,7 +907,7 @@ class ViewController: UIViewController, EngineDelegate {
       deadBricks.append(brickToDestroy)
 
       // Move the brick sprite in front of the other bricks.
-      brickToDestroy.sprite!.drawOrder = 199
+      brickToDestroy.sprite.drawOrder = 199
       spriteBatch.sortSpritesByDrawOrder()
 
       var brickIsKilled = false
@@ -942,7 +923,7 @@ class ViewController: UIViewController, EngineDelegate {
       }
 
       if settings.brickDarken {
-        brickToDestroy.sprite!.color = PPVector4WithRGB(132, 14, 63)
+        brickToDestroy.sprite.color = vectorWithRGB(132, 14, 63)
         brickIsKilled = true
       }
 
@@ -960,7 +941,7 @@ class ViewController: UIViewController, EngineDelegate {
 
         let tween = tweenPool.moveToTween()
         tween.target = brickToDestroy
-        tween.amount = GLKVector2Make(0, Float(viewportSize.height) + 100)
+        tween.amount = GLKVector2Make(0, viewportSize.y + 100)
         tween.duration = settings.brickDestructionDuration / 2
         tween.timingFunction = TimingFunctionCubicEaseIn
         tweenPool.add(tween)
@@ -1007,7 +988,7 @@ class ViewController: UIViewController, EngineDelegate {
       // then simply hide it. This keeps it in the scene graph, but at
       // least you won't see it.
       if !brickIsKilled {
-        brickToDestroy.sprite!.hidden = true
+        brickToDestroy.sprite.hidden = true
       }
     }
 
@@ -1090,8 +1071,8 @@ class ViewController: UIViewController, EngineDelegate {
       if settings.ballGlow && settings.colorEnabled {
         let tween = tweenPool.tintTween()
         tween.target = ballNode.sprite
-        tween.startColor = PPVector4WithRGB(255, 255, 255)
-        tween.endColor = PPVector4WithRGB(248, 202, 0)
+        tween.startColor = vectorWithRGB(255, 255, 255)
+        tween.endColor = vectorWithRGB(248, 202, 0)
         tween.duration = 1
         tween.timingFunction = TimingFunctionQuadraticEaseOut
         tweenPool.add(tween)
@@ -1134,14 +1115,14 @@ class ViewController: UIViewController, EngineDelegate {
     while t < deadBricks.count {
       let brickNode = deadBricks[t]
 
-      if brickNode.position.y > Float(viewportSize.height + 50) {
+      if brickNode.position.y > viewportSize.y + 50 {
         if let placeholderNode = worldNode.childNode(withName: "Placeholder") {
-          if placeholderNode.userData === brickNode.sprite! {
-            renderQueue.remove(placeholderNode.sprite!)
+          if placeholderNode.userData === brickNode.sprite {
+            engine.renderingEngine.renderQueue.remove(placeholderNode.sprite)
             worldNode.remove(placeholderNode)
           }
         }
-        spriteBatch.remove(brickNode.sprite!)
+        spriteBatch.remove(brickNode.sprite)
         worldNode.remove(brickNode)
         deadBricks.removeObject(brickNode)
       } else {
@@ -1154,10 +1135,10 @@ class ViewController: UIViewController, EngineDelegate {
     if colorGlitchCounter > 0 {
       colorGlitchCounter += 1
       if colorGlitchCounter < 10 {
-        engine.renderingEngine.clearColor = GLKVector4Make(PPRandomFloat(), PPRandomFloat(), PPRandomFloat(), 1)
+        engine.renderingEngine.clearColor = GLKVector4Make(Float.random(), Float.random(), Float.random(), 1)
       } else {
         colorGlitchCounter = 0
-        engine.renderingEngine.clearColor = PPVector4WithRGB(73, 10, 61)
+        engine.renderingEngine.clearColor = vectorWithRGB(73, 10, 61)
       }
     }
   }

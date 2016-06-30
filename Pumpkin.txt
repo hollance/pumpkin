@@ -14,12 +14,14 @@ Pumpkin in Swift + Metal
 	-	https://developer.apple.com/library/ios/samplecode/MetalBasic3D/Listings/MetalBasic3D_AAPLTransforms_mm.html#//apple_ref/doc/uid/TP40014603-MetalBasic3D_AAPLTransforms_mm-DontLinkElementID_7
 	-	see Metal by Example for helper functions
 
--	make sure nodes and sprites get deallocated etc
--	timers: what happens if there is a big shift in system time (because
-	the game was paused etc)?
--	put in git repo
--	also on iPhone (just scale from 1024x768 scene to device size?)
+-	when starting up, sometimes the bricks don't scale down properly;
+	is this because the ball already hits some bricks and they jelly?
+	(does this happen on the obj-c version too?)
 -	add a delay of a second before showing everything
+-	timers: what happens if there is a big shift in system time (because
+	the game was paused etc)? (For Timer this is no problem, but what
+	about times that use CACurrentMediaTime()?)
+-	also on iPhone (just scale from 1024x768 scene to device size?)
 
 -	docs:
 		Juice it or lose it - a talk by Martin Jonasson & Petri Purho (2012)
@@ -33,7 +35,28 @@ Pumpkin in Swift + Metal
 	-	clean up the OpenGL shit
 		https://github.com/joshb/CocoaOpenGL-Swift/tree/master/CocoaOpenGL-Swift
 		https://github.com/bradley/iOSSwiftOpenGL
-	-	Node.sprite should automatically unwrap already (shape too)
-			and give error message if no sprite set
-	-	put into its own Module
-	-	organize the classes into groups (Tweens, Scene Graph, OpenGL, etc)
+
+-	Sprite:
+-	use as few ! and ? as possible...
+-	ShaderAttributes.texCoord.rawValue
+-	RenderingEngine: 
+	-	OpenGL/Metal-specific RenderingEngines? (+ better name for this!)
+	-	don't initialize with OpenGLView? do we need layer + viewportsize?
+	-	better name
+-	SpriteSheet: use init? or throws?
+-	Visual has too many properties: Shape doesn't need the ones used by
+	Sprite.
+-	Tweenable: It now has two sections: for Node and for Sprite
+	-	BasicTween cannot have "target" then; this must be in the
+		subclasses only (don't know if that is a problem)
+	-	maybe PositionTweenable, ScaleTween(able), etc.
+-	Sprite: 
+	-	boundingBox
+	-	texturedQuad
+	-	how to get a pointer to just the quad?
+-	SpriteBatch + Sprite: smarter way to convert matrix to OpenGL data
+	+ RenderingEngine
+
+-	ShaderProgram: OpenGL error messages (see those GitHub repo links above)
+		https://github.com/joshb/CocoaOpenGL-Swift/tree/master/CocoaOpenGL-Swift
+		https://github.com/bradley/iOSSwiftOpenGL

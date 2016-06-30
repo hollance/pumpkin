@@ -1,10 +1,7 @@
-//import simd
 import GLKit
 import OpenGLES
 
-/*
- * Visual for a node that draws part of a texture.
- */
+/*! Visual for a node that draws part of a texture. */
 public class Sprite: Visual, Tweenable, Renderer {
   public weak var node: Node?
 
@@ -21,12 +18,15 @@ public class Sprite: Visual, Tweenable, Renderer {
   public var hidden: Bool = false {
     didSet { needsRedraw = true }
   }
+
   public var anchorPoint = GLKVector2Make(0.5, 0.5) {
     didSet { needsRedraw = true }
   }
+
   public var flipX: Bool = false {
     didSet { needsRedraw = true }
   }
+
   public var flipY: Bool = false {
     didSet { needsRedraw = true }
   }
@@ -53,6 +53,13 @@ public class Sprite: Visual, Tweenable, Renderer {
     }
   }
 
+  public var color = GLKVector4Make(1, 1, 1, 1) {
+    didSet { needsRedraw = true }
+  }
+
+  public var alpha: Float = 1 {
+    didSet { needsRedraw = true }
+  }
 
   // TODO: these belong only in Node
   public var position = GLKVector2Make(0, 0)
@@ -60,51 +67,38 @@ public class Sprite: Visual, Tweenable, Renderer {
   public var angle: Float = 0
 
 
-  public var color = GLKVector4Make(1, 1, 1, 1) {
-    didSet { needsRedraw = true }
-  }
-  public var alpha: Float = 1 {
-    didSet { needsRedraw = true }
-  }
-
-  /*
-   * If this is not nil, the sprite is drawn using only a small region of a 
-   * larger texture atlas.
-   */
+  /*! If this is not nil, the sprite is drawn using only a small region of a
+      larger texture atlas. */
   public var spriteFrame: SpriteFrame? {
     didSet { needsRedraw = true }
   }
 
-  /* 
-   * If this is not nil, then the sprite represents an entire texture. That is
-   * useful for large background images that do not fit into a sprite sheet.
-   */
+  /*! If this is not nil, then the sprite represents an entire texture. That is
+      useful for large background images that do not fit into a sprite sheet. */
   public var texture: Texture? {
     didSet { needsRedraw = true }
   }
 
-  /*
-   * A placeholder is a sprite without a texture and only a color. If texture
-   * and spriteFrame are both nil, set this property to make it a placeholder.
-   */
+  /*! A placeholder is a sprite without a texture and only a color. If texture
+      and spriteFrame are both nil, set this property to make it a placeholder. */
   public var placeholderContentSize = GLKVector2() {
     didSet { needsRedraw = true }
   }
 
-  /* Lower values draw first. Default is 0. */
+  /*! Lower values draw first and therefore appear behind other sprites. */
   public var drawOrder = 0
 
-  /*
-   * Returns an axis-aligned bounding box (AABB) that takes into consideration
-   * the sprite's anchor point, and the owning node's scale and rotation. The
-   * returned box is in the parent node's coordinate system.
-   *
-   * Note that a "box" is expressed as a GLKVector4, where x is the left edge,
-   * y is the top edge, z is the right edge, and w is the bottom edge. The width
-   * of the bounding box is (z - x); the height is (w - y).
-   *
-   * Note: The value of boundingBox is incorrect when the sprite is hidden!
-   */
+  /*!
+    Returns an axis-aligned bounding box (AABB) that takes into consideration
+    the sprite's anchor point, and the owning node's scale and rotation. The
+    returned box is in the parent node's coordinate system.
+
+    A "box" is expressed as a GLKVector4, where x is the left edge, y is the
+    top edge, z is the right edge, and w is the bottom edge. The width of the 
+    bounding box is (z - x); the height is (w - y).
+
+    Note: The value of boundingBox is incorrect when the sprite is hidden!
+  */
   public var boundingBox: GLKVector4 {
     let quad = texturedQuad
 
@@ -140,10 +134,10 @@ public class Sprite: Visual, Tweenable, Renderer {
     return GLKVector4Make(minX, minY, maxX, maxY)
   }
 
-  /* A cached copy of the quad. We only recompute this if quadDirty. */
+  /*! A cached copy of the quad. We only recompute this if quadDirty. */
   private var quad = TexturedQuad()
 
-  /* Returns the quad that is used to draw this sprite using OpenGL. */
+  /*! Returns the quad that is used to draw this sprite using OpenGL. */
   public var texturedQuad: TexturedQuad {
     if quadDirty {
       quadDirty = false
@@ -267,65 +261,51 @@ public class Sprite: Visual, Tweenable, Renderer {
     return quad
   }
 
-  /*
-   * Adds an animation to this sprite object. You need to add the animation
-   * before you can play it.
-   */
+  public init() { }
+
+  deinit {
+    //print("deinit \(self)")
+  }
+
+  // MARK: - Animations
+
+  /*! Adds an animation to this sprite object. You need to add the animation
+      before you can play it. */
   public func add(animation: Animation, withName name: String) {
-  	//PPAssert(_animations[name] == nil, @"Dictionary already contains object");
+    assert(animations[name] == nil, "Already have this animation")
     animations[name] = animation
   }
 
-  /* Plays the animation and keeps looping until you stop it or play another one. */
+  /*! Plays the animation and keeps looping until you stop it or play another. */
   public func playAnimation(name: String) {
     playAnimation(name, fromFrame: 0)
   }
 
-  /* Plays the animation, starting at the frame you specified. */
+  /*! Plays the animation, starting at the frame you specified. */
   public func playAnimation(name: String, fromFrame frameIndex: Int) {
-    //PPAssert(_animations[name] != nil, @"Dictionary does not contain object");
-
+    assert(animations[name] != nil, "Unknown animation")
     activeAnimation = animations[name]
-    if let anim = activeAnimation {
-      activeFrameIndex = frameIndex
-      activeSpriteFrame = anim.spriteFrames[activeFrameIndex]
-      elapsed = 0
-      currentLoop = 0
-    } else {
-      activeSpriteFrame = nil
-    }
+    activeFrameIndex = frameIndex
+    activeSpriteFrame = activeAnimation!.spriteFrames[activeFrameIndex]
+    elapsed = 0
+    currentLoop = 0
     needsRedraw = true
   }
 
-  /* 
-   * Stops the current animation, if any. This is useful for looping animations.
-   * This always restores the original sprite frame.
-   */
+  /*! Stops the current animation, if any. Useful for looping animations.
+      This always restores the original sprite frame. */
   public func stopAnimation() {
     activeAnimation = nil
     activeSpriteFrame = nil
     needsRedraw = true
   }
 
-  /* For debugging. */
-  //- (NSArray *)animations
-  //{
-  //	return [_animations allValues];
-  //}
-
-  private var animations: [String : Animation] = [:]
+  private(set) public var animations: [String : Animation] = [:]
   private var activeAnimation: Animation?
   private var activeSpriteFrame: SpriteFrame?
   private var activeFrameIndex = 0
   private var elapsed: Float = 0
   private var currentLoop = 0
-
-  public init() {
-  }
-
-  public func update(dt: Float) {
-    updateAnimations(dt)
-  }
 
   private func updateAnimations(dt: Float) {
     if let activeAnimation = activeAnimation {
@@ -334,8 +314,9 @@ public class Sprite: Visual, Tweenable, Renderer {
         elapsed = 0
         activeFrameIndex += 1
 
+        // Reached the end of the animation?
         if activeFrameIndex == activeAnimation.spriteFrames.count {
-          activeFrameIndex = 0;
+          activeFrameIndex = 0
           currentLoop += 1
           if activeAnimation.loops > 0 && currentLoop == activeAnimation.loops {
             if activeAnimation.restoreOriginalFrame {
@@ -347,16 +328,20 @@ public class Sprite: Visual, Tweenable, Renderer {
         }
 
         activeSpriteFrame = activeAnimation.spriteFrames[activeFrameIndex]
-      }
-      else {
+      } else {
         elapsed += dt
       }
     }
   }
 
-  public func render(context: RenderContext) {
-    //print(node?.name)
+  public func update(dt: Float) {
+    updateAnimations(dt)
+  }
 
+  // MARK: - Rendering
+
+  /* This draws the Sprite when it is not part of a SpriteBatch. */
+  public func render(context: RenderContext) {
     let shaderProgram: ShaderProgram
     if texture != nil {
       shaderProgram = context.texturedShader
@@ -365,18 +350,6 @@ public class Sprite: Visual, Tweenable, Renderer {
     }
 
     glUseProgram(shaderProgram.programName)
-
-    // TODO: there must be an easier way to use float4x4's elements directly...
-//    var m = [Float](count: 16, repeatedValue: 0)
-//    for i in 0..<4 {
-//      for j in 0..<4 {
-//        m[i + j*4] = context.matrix[i, j]
-//      }
-//    }
-//    for i in 0..<4 {       // try it with identity matrix?!?!
-//      m[i + i*4] = 1
-//    }
-//    print(m)
 
     var m = [Float](count: 16, repeatedValue: 0)
     m[0] = context.matrix.m00
@@ -396,24 +369,12 @@ public class Sprite: Visual, Tweenable, Renderer {
     m[14] = context.matrix.m32
     m[15] = context.matrix.m33
 
-    //var m2 = unsafeBitCast(context.matrix, [Float]) ???
-
-
     let uniforms = shaderProgram.uniforms
     glUniformMatrix4fv(GLint(uniforms.matrix), 1, GLboolean(GL_FALSE), m)
 
     glEnableVertexAttribArray(ShaderAttributes.position.rawValue)
     glEnableVertexAttribArray(ShaderAttributes.color.rawValue)
     glEnableVertexAttribArray(ShaderAttributes.texCoord.rawValue)
-
-//    var quad = texturedQuad
-
-//    print("|---------------")
-//    for v in 0..<4 {
-//  print(String(format: "pos %@", NSStringFromGLKVector2(quad.vertex[v].position)))
-//  print(String(format: "tex %@", NSStringFromGLKVector2(quad.vertex[v].texCoord)))
-//  //print(String(format: "color %d %d %d %d", quad.vertex[v].r, quad.vertex[v].g, quad.vertex[v].b, quad.vertex[v].a))
-//    }
 
           // how do I get a pointer to just this variable?
           // unsafeAddressOf() doesn't seem to work
@@ -422,13 +383,13 @@ public class Sprite: Visual, Tweenable, Renderer {
     let quads = [texturedQuad]
 
     quads.withUnsafeBufferPointer { buf in
-      let pointer = UnsafePointer<UInt8>(buf.baseAddress) // UnsafePointer<Void>(quad.vertex)
+      let pointer = UnsafePointer<UInt8>(buf.baseAddress)
       let stride = GLsizei(sizeof(TexturedVertex))
       let indices: [GLushort] = [ 0, 2, 1, 0, 3, 2 ]  // counter-clockwise!
 
-      glVertexAttribPointer(ShaderAttributes.position.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer /*+ offsetof(TexturedVertex, position)*/)
-      glVertexAttribPointer(ShaderAttributes.texCoord.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer + 8 /*offsetof(TexturedVertex, texCoord)*/)
-      glVertexAttribPointer(ShaderAttributes.color.rawValue, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, pointer + 16 /*offsetof(TexturedVertex, color)*/)
+      glVertexAttribPointer(ShaderAttributes.position.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer)
+      glVertexAttribPointer(ShaderAttributes.texCoord.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer + 8)
+      glVertexAttribPointer(ShaderAttributes.color.rawValue, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, pointer + 16)
 
       if let texture = texture {
         glBlendFunc(texture.premultipliedAlpha ? GLenum(GL_ONE) : GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA))
@@ -444,12 +405,12 @@ public class Sprite: Visual, Tweenable, Renderer {
 
     glBindTexture(GLenum(GL_TEXTURE_2D), 0)
 
-    ppDrawCalls += 1
-    ppTriangleCount += 2
-    ppDirtyCount += 1
+    debug.drawCalls += 1
+    debug.triangleCount += 2
+    debug.dirtyCount += 1
 
     needsRedraw = false
 
-    PPLogGLError()    
+    logOpenGLError()
   }
 }

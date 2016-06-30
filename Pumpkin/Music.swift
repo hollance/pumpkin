@@ -1,8 +1,6 @@
 import AVFoundation
 
-/*
- * For playing background music.
- */
+/*! For playing background music. */
 public class Music {
   private var player: AVAudioPlayer?
 

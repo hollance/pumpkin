@@ -1,3 +1,5 @@
+/* The OpenGL shaders that get compiled into ShaderProgram objects. */
+
 let ColoredVertexShader =
   "attribute vec4 a_position;\n" +
   "attribute vec4 a_color;\n" +

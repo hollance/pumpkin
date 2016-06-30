@@ -1,8 +1,6 @@
 import UIKit
 
-/*
- * View that knows how to render Metal content.
- */
+/*! View that knows how to render Metal content. */
 public class MetalView: UIView {
   public override class func layerClass() -> AnyClass {
     return CAMetalLayer.self

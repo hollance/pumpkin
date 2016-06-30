@@ -1,8 +1,6 @@
 import UIKit
 
-/*
- * The OpenGL view.
- */
+/*! View that knows how to render OpenGL content. */
 public class OpenGLView: UIView {
   public override class func layerClass() -> AnyClass {
     return CAEAGLLayer.self

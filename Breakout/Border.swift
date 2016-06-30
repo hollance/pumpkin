@@ -21,7 +21,7 @@ class Border: Shape {
   private var indices: [GLushort] = [0, 1, 2, 3]
 
   override func render(context: RenderContext) {
-    glUseProgram(context.coloredShader.programName);
+    glUseProgram(context.coloredShader.programName)
 
     let uniforms = context.coloredShader.uniforms
 
@@ -67,7 +67,7 @@ class Border: Shape {
       glUniformMatrix4fv(GLint(uniforms.matrix), 1, GLboolean(GL_FALSE), m)
 
       glVertexAttribPointer(ShaderAttributes.position.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer /*+ offsetof(PPColoredVertex, position)*/)
-      glVertexAttribPointer(ShaderAttributes.color.rawValue, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, pointer + 8 /*offsetof(PPColoredVertex, color)*/);
+      glVertexAttribPointer(ShaderAttributes.color.rawValue, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, pointer + 8 /*offsetof(PPColoredVertex, color)*/)
 
       glDrawElements(GLenum(GL_TRIANGLE_STRIP), 4, GLenum(GL_UNSIGNED_SHORT), indices)
     }
@@ -75,9 +75,9 @@ class Border: Shape {
     glDisableVertexAttribArray(ShaderAttributes.position.rawValue)
     glDisableVertexAttribArray(ShaderAttributes.color.rawValue)
 
-    ppDrawCalls += 1
-    ppTriangleCount += 2
-    ppDirtyCount += 1
+    debug.drawCalls += 1
+    debug.triangleCount += 2
+    debug.dirtyCount += 1
 
     needsRedraw = false
   }

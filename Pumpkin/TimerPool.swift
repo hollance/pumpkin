@@ -1,14 +1,29 @@
+/*!
+  Timers allow you to do two things:
+
+  1. Perform an action after a delay.
+  2. Perform an action every so often (repeating timer).
+  
+  Timers run in "game time", i.e. they only advance when the game advances,
+  with the same delta time.
+*/
 public class Timer {
-  var duration: Float = 0
-  var elapsed: Float = 0
-  var repeatCount: Int = -1  // 0 = indefinitely, -1 = never
-  var repetition: Int = 0    // how often repeated already
+  internal(set) public var duration: Float = 0
+  internal(set) public var elapsed: Float = 0
 
-  var block: TimerBlock?
+  /*! -1 = indefinitely, 0 = never */
+  internal(set) public var repeatCount: Int = 0
 
-  func prepareForReuse() {
+  /*! How often repeated already. */
+  internal(set) public var repetition: Int = 0
+
+  internal(set) public var block: TimerBlock?
+
+  internal init() { }
+
+  internal func prepareForReuse() {
     elapsed = 0
-    repeatCount = -1
+    repeatCount = 0
     repetition = 0
     block = nil
   }
@@ -16,25 +31,22 @@ public class Timer {
 
 public typealias TimerBlock = (Void) -> Void
 
-/*
- * Manages timers. Timers allow you to do two things:
- *
- * 1. Perform an action after a delay.
- * 2. Perform an action every so often (repeating timer).
- */
+/*!
+  Manages the timers. Timers allow you to do two things:
+
+  1. Perform an action after a delay.
+  2. Perform an action every so often (repeating timer).
+*/
 public class TimerPool {
   private var activeTimers: [Timer] = []
   private var recycledTimers: [Timer] = []
 
-  public init() {
-    activeTimers.reserveCapacity(10)
-    recycledTimers.reserveCapacity(10)
-  }
+  public init() { }
 
-  /*
-   * Performs a block after a delay. Returns a PPTimer object that allows you to
-   * cancel the timer.
-   */
+  /*!
+    Performs a block after a delay. Returns a Timer object that allows you to
+    cancel the timer.
+  */
   public func afterDelay(delay: Float, perform block: TimerBlock) -> Timer {
     let timer = newTimer()
     timer.duration = delay
@@ -57,26 +69,19 @@ public class TimerPool {
   }
 
   private func activateTimer(timer: Timer) {
-    //PPAssert(![_activeTimers containsObject:timer], @"Array already contains object");
+    assert(activeTimers.find(timer) == nil, "Array already contains object")
     activeTimers.append(timer)
   }
 
-  /* 
-   * Performs a selector after a delay. Returns a PPTimer object that allows you
-   * to cancel the timer.
-   */
-  //- (PPTimer *)afterDelay:(float)delay performSelector:(SEL)selector onTarget:(id)target;
-
-  /* Cancels a timer prematurely so that it does not perform its action. */
+  /*! Cancels a timer prematurely so that it does not perform its action. */
   public func cancelTimer(timer: Timer) {
-    //PPAssert([_activeTimers containsObject:timer], @"Array does not contain object");
     if let index = activeTimers.find(timer) {
       recycleTimer(timer)
       activeTimers.removeAtIndex(index)
     }
   }
 
-  /* Removes all active timers. Does not perform their actions. */
+  /*! Removes all active timers. Does not perform their actions. */
   public func cancelAllTimers() {
     for timer in activeTimers {
       recycleTimer(timer)
@@ -84,23 +89,16 @@ public class TimerPool {
     activeTimers.removeAll()
   }
 
-  /*
-   * Updates the timers. You're supposed to call this somewhere from within your
-   * game loop.
-   */
+  /*! Updates the timers. You're supposed to call this somewhere from within 
+      your game loop. */
   public func updateTimers(dt: Float) {
     var t = 0
     while t < activeTimers.count {
       let timer = activeTimers[t]
-
       if timer.elapsed >= timer.duration {
-        if let block = timer.block {
-          block()
-        }
-
+        timer.block?()
         timer.repetition += 1
-
-        if timer.repeatCount == -1 || (timer.repeatCount > 0 && timer.repetition == timer.repeatCount) {
+        if timer.repeatCount == 0 || timer.repetition == timer.repeatCount {
           recycleTimer(timer)
           activeTimers.removeAtIndex(t)
         } else {
@@ -113,7 +111,7 @@ public class TimerPool {
     }
   }
 
-  /* Empties the pool of recycled timers. */
+  /*! Empties the pool of recycled timers. */
   public func flushRecycledTimers() {
     recycledTimers.removeAll()
   }

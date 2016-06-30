@@ -19,7 +19,6 @@
 		7B4BB7931D21A07900271FBD /* Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB7771D21A07900271FBD /* Music.swift */; };
 		7B4BB7941D21A07900271FBD /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB7781D21A07900271FBD /* Node.swift */; };
 		7B4BB7951D21A07900271FBD /* OpenGLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB7791D21A07900271FBD /* OpenGLView.swift */; };
-		7B4BB7961D21A07900271FBD /* Pumpkin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB77A1D21A07900271FBD /* Pumpkin.swift */; };
 		7B4BB7971D21A07900271FBD /* RenderingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB77B1D21A07900271FBD /* RenderingEngine.swift */; };
 		7B4BB7981D21A07900271FBD /* RenderQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB77C1D21A07900271FBD /* RenderQueue.swift */; };
 		7B4BB7991D21A07900271FBD /* ShaderProgram.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB77D1D21A07900271FBD /* ShaderProgram.swift */; };
@@ -37,6 +36,10 @@
 		7B4BB7A51D21A07900271FBD /* Tweenable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB7891D21A07900271FBD /* Tweenable.swift */; };
 		7B4BB7A61D21A07900271FBD /* TweenPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB78A1D21A07900271FBD /* TweenPool.swift */; };
 		7B4BB7A71D21A07900271FBD /* Visual.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB78B1D21A07900271FBD /* Visual.swift */; };
+		7B4BB7B01D229FC700271FBD /* Vertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB7AF1D229FC700271FBD /* Vertex.swift */; };
+		7B4BB7B21D23038D00271FBD /* RenderContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB7B11D23038D00271FBD /* RenderContext.swift */; };
+		7B4BB7B41D2303D200271FBD /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB7B31D2303D200271FBD /* Renderer.swift */; };
+		7B4BB7B61D25387100271FBD /* Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4BB7B51D25387100271FBD /* Random.swift */; };
 		7B4E48B71D1DB754003BB2AB /* Ball.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E48B61D1DB754003BB2AB /* Ball.swift */; };
 		7B4E48B91D1DB784003BB2AB /* Border.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4E48B81D1DB784003BB2AB /* Border.swift */; };
 		7BB605001D183C9F00EF99F6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB604FF1D183C9F00EF99F6 /* AppDelegate.swift */; };
@@ -108,7 +111,6 @@
 		7B4BB7771D21A07900271FBD /* Music.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Music.swift; sourceTree = "<group>"; };
 		7B4BB7781D21A07900271FBD /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		7B4BB7791D21A07900271FBD /* OpenGLView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenGLView.swift; sourceTree = "<group>"; };
-		7B4BB77A1D21A07900271FBD /* Pumpkin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pumpkin.swift; sourceTree = "<group>"; };
 		7B4BB77B1D21A07900271FBD /* RenderingEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RenderingEngine.swift; sourceTree = "<group>"; };
 		7B4BB77C1D21A07900271FBD /* RenderQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RenderQueue.swift; sourceTree = "<group>"; };
 		7B4BB77D1D21A07900271FBD /* ShaderProgram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShaderProgram.swift; sourceTree = "<group>"; };
@@ -126,6 +128,10 @@
 		7B4BB7891D21A07900271FBD /* Tweenable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tweenable.swift; sourceTree = "<group>"; };
 		7B4BB78A1D21A07900271FBD /* TweenPool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TweenPool.swift; sourceTree = "<group>"; };
 		7B4BB78B1D21A07900271FBD /* Visual.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Visual.swift; sourceTree = "<group>"; };
+		7B4BB7AF1D229FC700271FBD /* Vertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex.swift; sourceTree = "<group>"; };
+		7B4BB7B11D23038D00271FBD /* RenderContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RenderContext.swift; sourceTree = "<group>"; };
+		7B4BB7B31D2303D200271FBD /* Renderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
+		7B4BB7B51D25387100271FBD /* Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Random.swift; sourceTree = "<group>"; };
 		7B4E48B61D1DB754003BB2AB /* Ball.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ball.swift; sourceTree = "<group>"; };
 		7B4E48B81D1DB784003BB2AB /* Border.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Border.swift; sourceTree = "<group>"; };
 		7BB604FC1D183C9F00EF99F6 /* Breakout.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Breakout.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -191,9 +197,8 @@
 				7B4BB7A81D21A2E200271FBD /* Sprites */,
 				7B4BB7A91D21A2FE00271FBD /* Tweening */,
 				7B4BB7731D21A07900271FBD /* Engine.swift */,
-				7B4BB7671D21A05D00271FBD /* Info.plist */,
 				7B4BB7651D21A05D00271FBD /* Pumpkin.h */,
-				7B4BB77A1D21A07900271FBD /* Pumpkin.swift */,
+				7B4BB7671D21A05D00271FBD /* Info.plist */,
 			);
 			path = Pumpkin;
 			sourceTree = "<group>";
@@ -202,11 +207,11 @@
 			isa = PBXGroup;
 			children = (
 				7B4BB7701D21A07900271FBD /* Animation.swift */,
+				7B4BB77F1D21A07900271FBD /* Shape.swift */,
 				7B4BB7811D21A07900271FBD /* Sprite.swift */,
 				7B4BB7821D21A07900271FBD /* SpriteBatch.swift */,
 				7B4BB7831D21A07900271FBD /* SpriteFrame.swift */,
 				7B4BB7841D21A07900271FBD /* SpriteSheet.swift */,
-				7B4BB77F1D21A07900271FBD /* Shape.swift */,
 			);
 			name = Sprites;
 			sourceTree = "<group>";
@@ -214,10 +219,10 @@
 		7B4BB7A91D21A2FE00271FBD /* Tweening */ = {
 			isa = PBXGroup;
 			children = (
+				7B4BB7871D21A07900271FBD /* TimingFunctions.swift */,
 				7B4BB7881D21A07900271FBD /* Tween.swift */,
 				7B4BB7891D21A07900271FBD /* Tweenable.swift */,
 				7B4BB78A1D21A07900271FBD /* TweenPool.swift */,
-				7B4BB7871D21A07900271FBD /* TimingFunctions.swift */,
 			);
 			name = Tweening;
 			sourceTree = "<group>";
@@ -227,8 +232,6 @@
 			children = (
 				7B4BB7781D21A07900271FBD /* Node.swift */,
 				7B4BB78B1D21A07900271FBD /* Visual.swift */,
-				7B4BB7861D21A07900271FBD /* TimerPool.swift */,
-				7B4BB7711D21A07900271FBD /* Collisions.swift */,
 			);
 			name = "Scene Graph";
 			sourceTree = "<group>";
@@ -236,13 +239,16 @@
 		7B4BB7AB1D21A31600271FBD /* OpenGL */ = {
 			isa = PBXGroup;
 			children = (
+				7B4BB7721D21A07900271FBD /* DebugLayer.swift */,
 				7B4BB7791D21A07900271FBD /* OpenGLView.swift */,
+				7B4BB7B11D23038D00271FBD /* RenderContext.swift */,
+				7B4BB7B31D2303D200271FBD /* Renderer.swift */,
 				7B4BB77B1D21A07900271FBD /* RenderingEngine.swift */,
 				7B4BB77C1D21A07900271FBD /* RenderQueue.swift */,
 				7B4BB77D1D21A07900271FBD /* ShaderProgram.swift */,
 				7B4BB77E1D21A07900271FBD /* Shaders.swift */,
 				7B4BB7851D21A07900271FBD /* Texture.swift */,
-				7B4BB7721D21A07900271FBD /* DebugLayer.swift */,
+				7B4BB7AF1D229FC700271FBD /* Vertex.swift */,
 			);
 			name = OpenGL;
 			sourceTree = "<group>";
@@ -259,8 +265,11 @@
 		7B4BB7AD1D21A34C00271FBD /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				7B4BB7711D21A07900271FBD /* Collisions.swift */,
 				7B4BB7741D21A07900271FBD /* Helpers.swift */,
 				7B4BB7751D21A07900271FBD /* Math.swift */,
+				7B4BB7B51D25387100271FBD /* Random.swift */,
+				7B4BB7861D21A07900271FBD /* TimerPool.swift */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -516,20 +525,23 @@
 			files = (
 				7B4BB78E1D21A07900271FBD /* DebugLayer.swift in Sources */,
 				7B4BB78F1D21A07900271FBD /* Engine.swift in Sources */,
+				7B4BB7B61D25387100271FBD /* Random.swift in Sources */,
 				7B4BB79E1D21A07900271FBD /* SpriteBatch.swift in Sources */,
 				7B4BB7951D21A07900271FBD /* OpenGLView.swift in Sources */,
 				7B4BB7971D21A07900271FBD /* RenderingEngine.swift in Sources */,
+				7B4BB7B01D229FC700271FBD /* Vertex.swift in Sources */,
 				7B4BB7941D21A07900271FBD /* Node.swift in Sources */,
+				7B4BB7B21D23038D00271FBD /* RenderContext.swift in Sources */,
 				7B4BB79A1D21A07900271FBD /* Shaders.swift in Sources */,
 				7B4BB79B1D21A07900271FBD /* Shape.swift in Sources */,
 				7B4BB7A31D21A07900271FBD /* TimingFunctions.swift in Sources */,
 				7B4BB78D1D21A07900271FBD /* Collisions.swift in Sources */,
+				7B4BB7B41D2303D200271FBD /* Renderer.swift in Sources */,
 				7B4BB7A21D21A07900271FBD /* TimerPool.swift in Sources */,
 				7B4BB79C1D21A07900271FBD /* SoundEffect.swift in Sources */,
 				7B4BB79D1D21A07900271FBD /* Sprite.swift in Sources */,
 				7B4BB7901D21A07900271FBD /* Helpers.swift in Sources */,
 				7B4BB7A71D21A07900271FBD /* Visual.swift in Sources */,
-				7B4BB7961D21A07900271FBD /* Pumpkin.swift in Sources */,
 				7B4BB7A01D21A07900271FBD /* SpriteSheet.swift in Sources */,
 				7B4BB78C1D21A07900271FBD /* Animation.swift in Sources */,
 				7B4BB7981D21A07900271FBD /* RenderQueue.swift in Sources */,

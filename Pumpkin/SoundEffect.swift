@@ -1,8 +1,6 @@
 import AVFoundation
 
-/*
- * For playing a sound effect. Simple wrapper around AVAudioPlayer.
- */
+/*! For playing a sound effect. Simple wrapper around AVAudioPlayer. */
 public class SoundEffect {
   private var player: AVAudioPlayer?
 

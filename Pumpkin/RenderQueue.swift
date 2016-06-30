@@ -1,18 +1,17 @@
-/*
- * Contains a list of renderers.
- */
+/*! 
+  Contains a list of renderers. The renderers are asked to render to the
+  screen in the order they've been added to the queue.
+*/
 public class RenderQueue {
   private var queue: [Renderer] = []
 
-  public init() {
-  }
+  public init() { }
 
   public func add(renderer: Renderer) {
     insert(renderer, atIndex: queue.count)
   }
 
   public func insert(renderer: Renderer, atIndex index: Int) {
-//    assert(queue.find(renderer) == nil, "Queue already contains renderer")
     queue.insert(renderer, atIndex: index)
   }
 
@@ -25,10 +24,6 @@ public class RenderQueue {
         t += 1
       }
     }
-// GRRR this doesn't seem to work
-//    if let index = queue.indexOf(renderer) {
-//      queue.removeAtIndex(index)
-//    }
   }
 
   public func removeAllRenderers() {

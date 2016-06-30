@@ -7,7 +7,7 @@
 */
 
 struct Settings {
-  // Time
+  // Time: by how much to speed up or slow down the time
   var timeScale: Float = 1
 
   // Color
@@ -195,9 +195,9 @@ extension Settings {
   mutating func customizeEffects() {
     allEffects()
 
-    musicEnabled = false
-    maxBalls = 1
-    ballType = 2
-    tweenLogo = false
+//    musicEnabled = false
+//    maxBalls = 1
+//    ballType = 2
+//    tweenLogo = true
   }
 }
