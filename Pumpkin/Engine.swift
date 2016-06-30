@@ -36,6 +36,11 @@ public class Engine {
   private var displayLink: CADisplayLink!
   private var timestamp: CFTimeInterval = 0
 
+  /*! The current time in the game world. Only advances when the game is
+      not paused. You should use this instead of doing your own time with
+      CACurrentMediaTime(). */
+  private(set) public var time: Float = 0
+
   private var debugLayer = DebugLayer()
 
   public init() {
@@ -81,6 +86,7 @@ public class Engine {
     debugLayer.update()
 
     if elapsedSeconds > 0 {
+      time += elapsedSeconds
       delegate?.update(elapsedSeconds)
       renderingEngine.update(elapsedSeconds)
     }

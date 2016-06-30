@@ -24,7 +24,7 @@ class Game: UIViewController, EngineDelegate {
 	var leftEyeNode: Node!
 	var rightEyeNode: Node!
 	var mouthNode: Node!
-	var nextBlinkTime = CFTimeInterval(0)
+	var nextBlinkTime: Float = 0
 	var blinkOn = false
 	var happy = false
 
@@ -54,7 +54,7 @@ class Game: UIViewController, EngineDelegate {
   var ballPaddleSound: SoundEffect!
   var ballBrickSound: [SoundEffect] = []
   var brickSoundCount = 0
-  var lastBrickSoundTime: CFTimeInterval = 0
+  var lastBrickSoundTime: Float = 0
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -209,7 +209,7 @@ class Game: UIViewController, EngineDelegate {
     mouthNode.name = "Mouth"
     paddleNode.add(mouthNode)
 
-    nextBlinkTime = CACurrentMediaTime() + 2
+    nextBlinkTime = engine.time + 2
     blinkOn = true
   }
 
@@ -784,10 +784,9 @@ class Game: UIViewController, EngineDelegate {
 
     // Blinking
 
-    let now = CACurrentMediaTime()
-    if now >= nextBlinkTime {
+    if engine.time >= nextBlinkTime {
       blinkOn = !blinkOn
-      nextBlinkTime = now + (blinkOn ? CFTimeInterval(1 + Float.random() * 2) : 0.1)
+      nextBlinkTime = engine.time + (blinkOn ? 1 + Float.random() * 2 : 0.1)
     }
 
     leftEyeNode.sprite.hidden = !blinkOn
@@ -885,15 +884,14 @@ class Game: UIViewController, EngineDelegate {
         hitBrick = true
 
         if settings.soundBrick {
-          let now = CACurrentMediaTime()
-          if now - lastBrickSoundTime > 1 {
+          if engine.time - lastBrickSoundTime > 1 {
             brickSoundCount = 0
           }
 
           ballBrickSound[brickSoundCount].play()
 
           brickSoundCount = min(brickSoundCount + 1, 11)
-          lastBrickSoundTime = now
+          lastBrickSoundTime = engine.time
         }
 
         brickToDestroy = brickNode
