@@ -372,9 +372,9 @@ public class Sprite: Visual, Tweenable, Renderer {
     let uniforms = shaderProgram.uniforms
     glUniformMatrix4fv(GLint(uniforms.matrix), 1, GLboolean(GL_FALSE), m)
 
-    glEnableVertexAttribArray(ShaderAttributes.position.rawValue)
-    glEnableVertexAttribArray(ShaderAttributes.color.rawValue)
-    glEnableVertexAttribArray(ShaderAttributes.texCoord.rawValue)
+    glEnableVertexAttribArray(shaderProgram.attributes.position)
+    glEnableVertexAttribArray(shaderProgram.attributes.color)
+    glEnableVertexAttribArray(shaderProgram.attributes.texCoord)
 
           // how do I get a pointer to just this variable?
           // unsafeAddressOf() doesn't seem to work
@@ -387,9 +387,9 @@ public class Sprite: Visual, Tweenable, Renderer {
       let stride = GLsizei(sizeof(TexturedVertex))
       let indices: [GLushort] = [ 0, 2, 1, 0, 3, 2 ]  // counter-clockwise!
 
-      glVertexAttribPointer(ShaderAttributes.position.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer)
-      glVertexAttribPointer(ShaderAttributes.texCoord.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer + 8)
-      glVertexAttribPointer(ShaderAttributes.color.rawValue, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, pointer + 16)
+      glVertexAttribPointer(shaderProgram.attributes.position, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer)
+      glVertexAttribPointer(shaderProgram.attributes.texCoord, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer + 8)
+      glVertexAttribPointer(shaderProgram.attributes.color, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, pointer + 16)
 
       if let texture = texture {
         glBlendFunc(texture.premultipliedAlpha ? GLenum(GL_ONE) : GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA))
@@ -399,9 +399,9 @@ public class Sprite: Visual, Tweenable, Renderer {
       glDrawElements(GLenum(GL_TRIANGLES), 6, GLenum(GL_UNSIGNED_SHORT), indices)
     }
 
-    glDisableVertexAttribArray(ShaderAttributes.texCoord.rawValue)
-    glDisableVertexAttribArray(ShaderAttributes.color.rawValue)
-    glDisableVertexAttribArray(ShaderAttributes.position.rawValue)
+    glDisableVertexAttribArray(shaderProgram.attributes.texCoord)
+    glDisableVertexAttribArray(shaderProgram.attributes.color)
+    glDisableVertexAttribArray(shaderProgram.attributes.position)
 
     glBindTexture(GLenum(GL_TEXTURE_2D), 0)
 

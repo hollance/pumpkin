@@ -577,7 +577,6 @@ class ViewController: UIViewController, EngineDelegate {
 
   private dynamic func longPress(sender: UILongPressGestureRecognizer) {
     if sender.state == .Ended {
-      print("LONG PRESS ended")
       restartGame()
     }
   }

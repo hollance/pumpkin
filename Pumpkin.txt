@@ -36,7 +36,11 @@ Pumpkin in Swift + Metal
 		https://github.com/joshb/CocoaOpenGL-Swift/tree/master/CocoaOpenGL-Swift
 		https://github.com/bradley/iOSSwiftOpenGL
 
--	Sprite:
+-	sometimes there is an error in tweensForTarget (only when using
+	multiple balls? not sure): tween.target is null but I try to unwrap
+	it. this should not happen, of course. Is this a timing thing, where
+	a tween has *just* lost its target because the node or sprite is
+	removed, but the tween is still active?
 -	use as few ! and ? as possible...
 -	ShaderAttributes.texCoord.rawValue
 -	RenderingEngine: 
@@ -56,7 +60,18 @@ Pumpkin in Swift + Metal
 	-	how to get a pointer to just the quad?
 -	SpriteBatch + Sprite: smarter way to convert matrix to OpenGL data
 	+ RenderingEngine
-
--	ShaderProgram: OpenGL error messages (see those GitHub repo links above)
-		https://github.com/joshb/CocoaOpenGL-Swift/tree/master/CocoaOpenGL-Swift
-		https://github.com/bradley/iOSSwiftOpenGL
+-	where is GTK* being used? (vector and matrix stuff)
+	-	GLKVector2(), 4(), Make(), PPVector2Zero
+	-	GLKMatrix4Multiply() -- two matrices
+	-	PPVector2LengthSquared
+	-	PPVector2ClampLength
+	-	PPVector2Clamp
+	-	GLKVector2MultiplyScalar + AddScalar
+	-	GLKMatrix4Identity
+	-	NSStringFromGLKVector2, 4
+	-	GLKVector2Subtract + Add + Divide + Multiply
+	-	GLKVector4Lerp
+	
+	
+	
+	

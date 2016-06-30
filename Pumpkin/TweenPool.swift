@@ -146,7 +146,7 @@ public class TweenPool {
   public func tweensForTarget(target: Tweenable, withName name: String) -> [Tween] {
     var array: [Tween] = []
     for tween in activeTweens {
-      if tween.target! === target && tween.name == name {
+      if let tgt = tween.target where tgt === target && tween.name == name {
         array.append(tween)
       }
     }

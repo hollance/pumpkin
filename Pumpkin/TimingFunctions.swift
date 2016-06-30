@@ -33,7 +33,6 @@
  */
 
 import Foundation
-import GLKit
 
 public typealias TimingFunction = (Float) -> Float
 

@@ -1,4 +1,3 @@
-//import simd
 import GLKit
 import Pumpkin
 
@@ -21,12 +20,14 @@ class Border: Shape {
   private var indices: [GLushort] = [0, 1, 2, 3]
 
   override func render(context: RenderContext) {
-    glUseProgram(context.coloredShader.programName)
+    let shaderProgram: ShaderProgram = context.coloredShader
 
-    let uniforms = context.coloredShader.uniforms
+    glUseProgram(shaderProgram.programName)
 
-    glEnableVertexAttribArray(ShaderAttributes.position.rawValue)
-    glEnableVertexAttribArray(ShaderAttributes.color.rawValue)
+    let uniforms = shaderProgram.uniforms
+
+    glEnableVertexAttribArray(shaderProgram.attributes.position)
+    glEnableVertexAttribArray(shaderProgram.attributes.color)
 
     for t in 0..<4 {
       var vertex = vertices[t]
@@ -40,7 +41,6 @@ class Border: Shape {
     }
 
     transformedVertices.withUnsafeBufferPointer { buf in
-
       let pointer = UnsafePointer<UInt8>(buf.baseAddress)
       let stride = GLsizei(sizeof(ColoredVertex))
 
@@ -66,14 +66,14 @@ class Border: Shape {
 
       glUniformMatrix4fv(GLint(uniforms.matrix), 1, GLboolean(GL_FALSE), m)
 
-      glVertexAttribPointer(ShaderAttributes.position.rawValue, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer /*+ offsetof(PPColoredVertex, position)*/)
-      glVertexAttribPointer(ShaderAttributes.color.rawValue, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, pointer + 8 /*offsetof(PPColoredVertex, color)*/)
+      glVertexAttribPointer(shaderProgram.attributes.position, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, pointer)
+      glVertexAttribPointer(shaderProgram.attributes.color, 4, GLenum(GL_UNSIGNED_BYTE), GLboolean(GL_TRUE), stride, pointer + 8)
 
       glDrawElements(GLenum(GL_TRIANGLE_STRIP), 4, GLenum(GL_UNSIGNED_SHORT), indices)
     }
 
-    glDisableVertexAttribArray(ShaderAttributes.position.rawValue)
-    glDisableVertexAttribArray(ShaderAttributes.color.rawValue)
+    glDisableVertexAttribArray(shaderProgram.attributes.position)
+    glDisableVertexAttribArray(shaderProgram.attributes.color)
 
     debug.drawCalls += 1
     debug.triangleCount += 2

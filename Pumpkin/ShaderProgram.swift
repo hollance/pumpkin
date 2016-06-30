@@ -1,21 +1,23 @@
 import OpenGLES
 
-public enum ShaderAttributes: GLuint {
-  case position = 0
-  case texCoord = 1
-  case color    = 2
-}
-
-public struct ShaderUniforms {
-  public var matrix: GLuint = 0
-  public var sampler: GLuint = 0
-}
-
 /*! Encapsulates a shader program consisting of a vertex and fragment shader. */
 public class ShaderProgram {
 
   private(set) public var programName: GLuint = 0
-  private(set) public var uniforms = ShaderUniforms()
+
+  public struct Attributes {
+    public let position: GLuint = 0
+    public let texCoord: GLuint = 1
+    public let color: GLuint = 2
+  }
+
+  public struct Uniforms {
+    public var matrix: GLuint = 0
+    public var sampler: GLuint = 0
+  }
+
+  private(set) public var attributes = Attributes()
+  private(set) public var uniforms = Uniforms()
 
   public init(vertexSource: String, fragmentSource: String) {
 		let vertexShader = compileShaderOfType(GLenum(GL_VERTEX_SHADER), fromSource: vertexSource)
@@ -23,11 +25,8 @@ public class ShaderProgram {
 
 		programName = buildProgramWithShaders([vertexShader, fragmentShader])
 
-		uniforms.matrix = GLuint(glGetUniformLocation(programName, "u_matrix"))
-    let result = glGetUniformLocation(programName, "u_sampler")
-    if result >= 0 {
-      uniforms.sampler = GLuint(result)
-    }
+		uniforms.matrix = getUniformLocation("u_matrix")
+		uniforms.sampler = getUniformLocation("u_sampler")
 
     logOpenGLError()
   }
@@ -36,25 +35,39 @@ public class ShaderProgram {
     glDeleteProgram(programName)
   }
 
+  private func getUniformLocation(name: String) -> GLuint {
+    let result = glGetUniformLocation(programName, name)
+    return result >= 0 ? GLuint(result) : 0
+  }
+
   private func compileShaderOfType(shaderType: GLenum, fromSource source: String) -> GLuint {
     let shaderHandle = glCreateShader(shaderType)
 
     var utf8 = (source as NSString).UTF8String
-    //print(String(format: "%s", utf8))
+    //print(String(format: "Shader source code:\n%s", utf8))
+
     glShaderSource(shaderHandle, 1, &utf8, nil)
     glCompileShader(shaderHandle)
 
     var status: GLint = GL_FALSE
     glGetShaderiv(shaderHandle, GLenum(GL_COMPILE_STATUS), &status)
     if status == GL_FALSE {
-//      var messages = [GLchar](count: 256, repeatedValue: 0)
-//      glGetShaderInfoLog(shaderHandle, 255, nil, messages)
-//      print(String(format: "Error compiling shader: %s", messages))
-      print("Error compiling shader")
+      print("Error compiling shader: \(getShaderInfoLog(shaderHandle))")
       exit(1)
     }
 
     return shaderHandle
+  }
+
+  private func getShaderInfoLog(shader: GLuint) -> String {
+    var length: GLint = 0
+    glGetShaderiv(shader, GLenum(GL_INFO_LOG_LENGTH), &length)
+
+    var str = [GLchar](count: Int(length) + 1, repeatedValue: GLchar(0))
+    var size: GLsizei = 0
+    glGetShaderInfoLog(shader, GLsizei(length), &size, &str)
+
+    return String.fromCString(str)!
   }
 
   private func buildProgramWithShaders(shaders: [GLuint]) -> GLuint {
@@ -64,19 +77,16 @@ public class ShaderProgram {
       glAttachShader(programHandle, shaderName)
     }
 
-    glBindAttribLocation(programHandle, ShaderAttributes.position.rawValue, "a_position")
-    glBindAttribLocation(programHandle, ShaderAttributes.texCoord.rawValue, "a_texCoord")
-    glBindAttribLocation(programHandle, ShaderAttributes.color.rawValue, "a_color")
+    glBindAttribLocation(programHandle, attributes.position, "a_position")
+    glBindAttribLocation(programHandle, attributes.texCoord, "a_texCoord")
+    glBindAttribLocation(programHandle, attributes.color, "a_color")
 
     glLinkProgram(programHandle)
 
     var status: GLint = GL_FALSE
     glGetProgramiv(programHandle, GLenum(GL_LINK_STATUS), &status)
     if status == GL_FALSE {
-//      GLchar messages[256];
-//      glGetProgramInfoLog(programHandle, sizeof(messages), NULL, messages);
-//      PPLog(@"Error linking program: %s", messages);
-      print("Error linking program")
+      print("Error linking program: \(getProgramInfoLog(programName))")
       exit(1)
     }
 
@@ -86,5 +96,16 @@ public class ShaderProgram {
     }
 
     return programHandle
+  }
+
+  private func getProgramInfoLog(program: GLuint) -> String {
+    var length: GLint = 0
+    glGetProgramiv(program, GLenum(GL_INFO_LOG_LENGTH), &length)
+
+    var str = [GLchar](count: Int(length) + 1, repeatedValue: GLchar(0))
+    var size: GLsizei = 0
+    glGetProgramInfoLog(program, GLsizei(length), &size, &str)
+
+    return String.fromCString(str)!
   }
 }
