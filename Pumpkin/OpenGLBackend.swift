@@ -10,22 +10,13 @@ public func logOpenGLError(file: String = #file, line: UInt = #line) {
 }
 
 /*! Responsible for setting up and managing OpenGL state. */
-public class RenderingEngine {
+internal class OpenGLBackend: RenderBackend {
+  internal let eaglLayer: CAEAGLLayer
+  internal let viewportSize: float2
+  internal var clearColor = float4(0, 0, 0, 1)
+  internal var modelviewMatrix = float4x4.identity
 
-  /*! Dimensions of the visible screen. Equal to the bounds of the OpenGL view. */
-  public let viewportSize: float2
-
-  /*! Fill color for the background. Default is black. */
-  public var clearColor = float4(0, 0, 0, 1)
-
-  /*! For special effects. */
-  public var modelviewMatrix = float4x4.identity
   private var projectionMatrix = float4x4.identity
-
-  /*! The items to be rendered. */
-  public var renderQueue = RenderQueue()
-
-  private let eaglLayer: CAEAGLLayer
   private let screenScale: Float
 	private var context: EAGLContext!
   private var framebuffer: GLuint = 0
@@ -34,9 +25,9 @@ public class RenderingEngine {
   private var coloredShader: ShaderProgram!
   private var renderContext = RenderContext()
 
-  public init(view: OpenGLView) {
-		eaglLayer = view.layer as! CAEAGLLayer
-		viewportSize = float2(Float(view.bounds.width), Float(view.bounds.height))
+  internal init(layer: CAEAGLLayer) {
+		eaglLayer = layer
+		viewportSize = float2(Float(layer.bounds.width), Float(layer.bounds.height))
 		screenScale = Float(UIScreen.mainScreen().scale)
 
     setUpContext()
@@ -126,11 +117,11 @@ public class RenderingEngine {
   	print(String(format: "Supported OpenGL extensions: %s", glGetString(GLenum(GL_EXTENSIONS))))
   }
 
-  public func update(dt: Float) {
-    renderQueue.update(dt)
+  internal func update(dt: Float) {
+    // nothing to do here
   }
 
-  public func render() {
+  internal func render(renderQueue: RenderQueue) {
     glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w)
     glClear(GLenum(GL_COLOR_BUFFER_BIT))
 

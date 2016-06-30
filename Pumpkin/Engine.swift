@@ -1,5 +1,6 @@
 import QuartzCore
 import UIKit
+import simd
 
 public protocol EngineDelegate: class {
   func update(dt: Float)
@@ -9,6 +10,7 @@ public protocol EngineDelegate: class {
  * The main class. It owns everything else.
  */
 public class Engine {
+  /*! Connect this to your main game loop. */
   public weak var delegate: EngineDelegate?
 
   /*! Whether the engine is currently paused. Default is true. */
@@ -31,16 +33,28 @@ public class Engine {
   /*! The root of the scene graph. */
   private(set) public var rootNode = Node()
 
-  public var renderingEngine: RenderingEngine!
+  /*! The items to be rendered. */
+  public var renderQueue = RenderQueue()
 
-  private var displayLink: CADisplayLink!
-  private var timestamp: CFTimeInterval = 0
+  /*! Dimensions of the visible screen. Equal to the bounds of the backing layer. */
+  public var viewportSize: float2 {
+    return backend?.viewportSize ?? float2.zero
+  }
+
+  /*! Fill color for the background. Default is black. */
+  public var clearColor = float4(0, 0, 0, 1)
+
+  /*! For special effects. */
+  public var modelviewMatrix = float4x4.identity
 
   /*! The current time in the game world. Only advances when the game is
       not paused. You should use this instead of doing your own time with
       CACurrentMediaTime(). */
   private(set) public var time: Float = 0
 
+  private var backend: RenderBackend!
+  private var displayLink: CADisplayLink!
+  private var timestamp: CFTimeInterval = 0
   private var debugLayer = DebugLayer()
 
   public init() {
@@ -78,6 +92,19 @@ public class Engine {
     displayLink = nil
   }
 
+  // MARK: - Back-end
+
+  public func connectToLayer(layer: CALayer) {
+    if let layer = layer as? CAEAGLLayer {
+      backend = OpenGLBackend(layer: layer)
+    } else {
+      fatalError("Unsupported layer type")
+    }
+  }
+
+  // MARK: - Game Loop
+
+  /*! Updates game time and the scene graph, and renders everything. */
   private dynamic func shouldRedraw(displayLink: CADisplayLink) {
     let now = displayLink.timestamp
     let elapsedSeconds = Float(now - timestamp)
@@ -88,13 +115,21 @@ public class Engine {
     if elapsedSeconds > 0 {
       time += elapsedSeconds
       delegate?.update(elapsedSeconds)
-      renderingEngine.update(elapsedSeconds)
+      backend.update(elapsedSeconds)
+      renderQueue.update(elapsedSeconds)
     }
 
-    rootNode.visit(false)
-    renderingEngine.render()
-
+    render()
     debugLayer.render()
+  }
+
+  /*! Useful for forcing the current state to (pre)render or render again. */
+  public func render() {
+    rootNode.visit(false)
+
+    backend.clearColor = clearColor
+    backend.modelviewMatrix = modelviewMatrix
+    backend.render(renderQueue)
   }
 
   // MARK: - Background Notifications

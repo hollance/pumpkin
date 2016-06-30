@@ -93,10 +93,19 @@ class Game: UIViewController, EngineDelegate {
     settings.customizeEffects()
 
     engine.delegate = self
+    engine.connectToLayer(openGLView.layer)
 
-    let renderingEngine = RenderingEngine(view: openGLView)
-    engine.renderingEngine = renderingEngine
-    viewportSize = renderingEngine.viewportSize
+    //viewportSize = engine.viewportSize
+
+    // Quick-n-dirty support for iPhone. We pretend it's still an iPad but
+    // scale down to fit the iPhone's screen dimensions.
+    viewportSize = float2(1024, 768)
+    engine.modelviewMatrix = float4x4([
+      [ engine.viewportSize.x / viewportSize.x, 0, 0, 0 ],
+      [ 0, engine.viewportSize.y / viewportSize.y, 0, 0 ],
+      [ 0, 0, 1, 0 ],
+      [ 0, 0, 0, 1 ],
+    ])
 
     // TODO: choose filename based on device type?
     let filename = "Sprites@2x"
@@ -106,14 +115,13 @@ class Game: UIViewController, EngineDelegate {
     texture.premultipliedAlpha = false
     spriteBatch.texture = texture
 
-    logoTexture = Texture(filename: "Juicy")
+    logoTexture = Texture(filename: "Juicy@2x")
 
     setUpSound()
     restartGame()
 
     // Draw the first frame, or the screen will flash briefly at startup.
-    engine.rootNode.visit(false)
-    engine.renderingEngine.render()
+    engine.render()
   }
 
   func setUpSound() {
@@ -132,7 +140,7 @@ class Game: UIViewController, EngineDelegate {
   }
 
   func restartGame() {
-    engine.renderingEngine.renderQueue.removeAllRenderers()
+    engine.renderQueue.removeAllRenderers()
     spriteBatch.removeAllSprites()
     tweenPool.removeAllTweens(finish: false)
     timerPool.cancelAllTimers()
@@ -141,7 +149,7 @@ class Game: UIViewController, EngineDelegate {
     worldNode = Node()
     engine.rootNode.add(worldNode)
 
-    engine.renderingEngine.renderQueue.add(spriteBatch)
+    engine.renderQueue.add(spriteBatch)
 
     // Position the root node in the center of the screen, so we can rotate
     // the world around that. But we still want the top-left corner of the
@@ -216,7 +224,7 @@ class Game: UIViewController, EngineDelegate {
   func setUpBorders() {
     let leftBorderShape = Border()
     leftBorderShape.length = viewportSize.y
-    engine.renderingEngine.renderQueue.add(leftBorderShape)
+    engine.renderQueue.add(leftBorderShape)
 
     leftBorder = Node()
     leftBorder.position = float2(0, 0)
@@ -227,7 +235,7 @@ class Game: UIViewController, EngineDelegate {
 
     let rightBorderShape = Border()
     rightBorderShape.length = viewportSize.y
-    engine.renderingEngine.renderQueue.add(rightBorderShape)
+    engine.renderQueue.add(rightBorderShape)
 
     rightBorder = Node()
     rightBorder.position = float2(viewportSize.x, viewportSize.y)
@@ -238,7 +246,7 @@ class Game: UIViewController, EngineDelegate {
 
     let topBorderShape = Border()
     topBorderShape.length = viewportSize.x
-    engine.renderingEngine.renderQueue.add(topBorderShape)
+    engine.renderQueue.add(topBorderShape)
 
     topBorder = Node()
     topBorder.position = float2(0, BorderThickness)
@@ -290,7 +298,7 @@ class Game: UIViewController, EngineDelegate {
           let placeholderSprite = Sprite()
           placeholderSprite.placeholderContentSize = brickSprite.contentSize
           placeholderSprite.color = vectorWithRGB(255, 255, 0)
-          engine.renderingEngine.renderQueue.insert(placeholderSprite, atIndex: 0)
+          engine.renderQueue.insert(placeholderSprite, atIndex: 0)
 
           let placeholderNode = Node()
           placeholderNode.position = brickNode.position
@@ -364,7 +372,7 @@ class Game: UIViewController, EngineDelegate {
 
   func applyColorSettings() {
     if settings.colorEnabled {
-      engine.renderingEngine.clearColor = vectorWithRGB(73, 10, 61)
+      engine.clearColor = vectorWithRGB(73, 10, 61)
 
       paddleNode.sprite.color = vectorWithRGB(233, 127, 2)
       
@@ -383,7 +391,7 @@ class Game: UIViewController, EngineDelegate {
     }
     else
     {
-      engine.renderingEngine.clearColor = vectorWithRGB(0, 0, 0)
+      engine.clearColor = vectorWithRGB(0, 0, 0)
 
       let whiteColor = vectorWithRGB(255, 255, 255)
 
@@ -517,7 +525,7 @@ class Game: UIViewController, EngineDelegate {
     if settings.tweenLogo {
       let logoSprite = Sprite()
       logoSprite.texture = logoTexture
-      engine.renderingEngine.renderQueue.add(logoSprite)
+      engine.renderQueue.add(logoSprite)
 
       let logoNode = Node()
       logoNode.visual = logoSprite
@@ -558,7 +566,7 @@ class Game: UIViewController, EngineDelegate {
       tweenPool.add(fadeTween)
 
       timerPool.afterDelay(4) {
-        self.engine.renderingEngine.renderQueue.remove(logoNode.sprite)
+        self.engine.renderQueue.remove(logoNode.sprite)
         logoNode.removeFromParent()
       }
     }
@@ -1115,7 +1123,7 @@ class Game: UIViewController, EngineDelegate {
       if brickNode.position.y > viewportSize.y + 50 {
         if let placeholderNode = worldNode.childNode(withName: "Placeholder") {
           if placeholderNode.userData === brickNode.sprite {
-            engine.renderingEngine.renderQueue.remove(placeholderNode.sprite)
+            engine.renderQueue.remove(placeholderNode.sprite)
             worldNode.remove(placeholderNode)
           }
         }
@@ -1132,10 +1140,10 @@ class Game: UIViewController, EngineDelegate {
     if colorGlitchCounter > 0 {
       colorGlitchCounter += 1
       if colorGlitchCounter < 10 {
-        engine.renderingEngine.clearColor = float4(Float.random(), Float.random(), Float.random(), 1)
+        engine.clearColor = float4(Float.random(), Float.random(), Float.random(), 1)
       } else {
         colorGlitchCounter = 0
-        engine.renderingEngine.clearColor = vectorWithRGB(73, 10, 61)
+        engine.clearColor = vectorWithRGB(73, 10, 61)
       }
     }
   }

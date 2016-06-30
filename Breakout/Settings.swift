@@ -193,25 +193,25 @@ extension Settings {
   /* Here you can make your own customizations. This function is called
      when the game starts. */
   mutating func customizeEffects() {
-//    allEffects()
+    allEffects()
+
+    musicEnabled = false
+    maxBalls = 1
+    ballType = 2
+    tweenLogo = true
+
+//    colorEnabled = true
+//    paddleStretch = true
+//    paddleFace = true
+//    paddleEyeScale = 0.8
+//    paddleEyeSeparation = 45
+//    paddleLookAtBall = true
+//    paddleMouthScale = 0.8
 //
-//    musicEnabled = false
-//    maxBalls = 1
-//    ballType = 2
-//    tweenLogo = true
-
-    colorEnabled = true
-    paddleStretch = true
-    paddleFace = true
-    paddleEyeScale = 0.8
-    paddleEyeSeparation = 45
-    paddleLookAtBall = true
-    paddleMouthScale = 0.8
-
-    tweeningEnabled = true
-    tweenBorders = true
-    tweeningDuration = 2
-    tweeningDelay = 0
-    easingEquation = 2
+//    tweeningEnabled = true
+//    tweenBorders = true
+//    tweeningDuration = 2
+//    tweeningDelay = 0
+//    easingEquation = 2
   }
 }

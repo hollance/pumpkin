@@ -4,121 +4,7 @@
 <dict>
 	<key>frames</key>
 	<dict>
-		<key>BallRound.png</key>
-		<dict>
-			<key>height</key>
-			<integer>20</integer>
-			<key>offsetX</key>
-			<real>0</real>
-			<key>offsetY</key>
-			<real>0</real>
-			<key>originalHeight</key>
-			<integer>20</integer>
-			<key>originalWidth</key>
-			<integer>21</integer>
-			<key>width</key>
-			<integer>21</integer>
-			<key>x</key>
-			<integer>131</integer>
-			<key>y</key>
-			<integer>96</integer>
-		</dict>
-		<key>BallBowling.png</key>
-		<dict>
-			<key>height</key>
-			<integer>20</integer>
-			<key>offsetX</key>
-			<real>0</real>
-			<key>offsetY</key>
-			<real>0</real>
-			<key>originalHeight</key>
-			<integer>20</integer>
-			<key>originalWidth</key>
-			<integer>20</integer>
-			<key>width</key>
-			<integer>20</integer>
-			<key>x</key>
-			<integer>54</integer>
-			<key>y</key>
-			<integer>24</integer>
-		</dict>
-		<key>BallSquare.png</key>
-		<dict>
-			<key>height</key>
-			<integer>20</integer>
-			<key>offsetX</key>
-			<real>0</real>
-			<key>offsetY</key>
-			<real>0</real>
-			<key>originalHeight</key>
-			<integer>20</integer>
-			<key>originalWidth</key>
-			<integer>20</integer>
-			<key>width</key>
-			<integer>20</integer>
-			<key>x</key>
-			<integer>54</integer>
-			<key>y</key>
-			<integer>2</integer>
-		</dict>
-		<key>Brick.png</key>
-		<dict>
-			<key>height</key>
-			<integer>30</integer>
-			<key>offsetX</key>
-			<real>0</real>
-			<key>offsetY</key>
-			<real>0</real>
-			<key>originalHeight</key>
-			<integer>30</integer>
-			<key>originalWidth</key>
-			<integer>75</integer>
-			<key>width</key>
-			<integer>75</integer>
-			<key>x</key>
-			<integer>2</integer>
-			<key>y</key>
-			<integer>96</integer>
-		</dict>
-		<key>Eye.png</key>
-		<dict>
-			<key>height</key>
-			<integer>50</integer>
-			<key>offsetX</key>
-			<real>0</real>
-			<key>offsetY</key>
-			<real>0</real>
-			<key>originalHeight</key>
-			<integer>50</integer>
-			<key>originalWidth</key>
-			<integer>50</integer>
-			<key>width</key>
-			<integer>50</integer>
-			<key>x</key>
-			<integer>2</integer>
-			<key>y</key>
-			<integer>2</integer>
-		</dict>
-		<key>Mouth.png</key>
-		<dict>
-			<key>height</key>
-			<integer>25</integer>
-			<key>offsetX</key>
-			<real>0</real>
-			<key>offsetY</key>
-			<real>0</real>
-			<key>originalHeight</key>
-			<integer>25</integer>
-			<key>originalWidth</key>
-			<integer>50</integer>
-			<key>width</key>
-			<integer>50</integer>
-			<key>x</key>
-			<integer>79</integer>
-			<key>y</key>
-			<integer>96</integer>
-		</dict>
-		<key>Paddle.png</key>
+		<key>BallBowling@2x.png</key>
 		<dict>
 			<key>height</key>
 			<integer>40</integer>
@@ -129,13 +15,127 @@
 			<key>originalHeight</key>
 			<integer>40</integer>
 			<key>originalWidth</key>
-			<integer>130</integer>
+			<integer>40</integer>
 			<key>width</key>
-			<integer>130</integer>
+			<integer>40</integer>
+			<key>x</key>
+			<integer>104</integer>
+			<key>y</key>
+			<integer>44</integer>
+		</dict>
+		<key>BallRound@2x.png</key>
+		<dict>
+			<key>height</key>
+			<integer>40</integer>
+			<key>offsetX</key>
+			<real>0</real>
+			<key>offsetY</key>
+			<real>0</real>
+			<key>originalHeight</key>
+			<integer>40</integer>
+			<key>originalWidth</key>
+			<integer>40</integer>
+			<key>width</key>
+			<integer>40</integer>
+			<key>x</key>
+			<integer>104</integer>
+			<key>y</key>
+			<integer>2</integer>
+		</dict>
+		<key>BallSquare@2x.png</key>
+		<dict>
+			<key>height</key>
+			<integer>40</integer>
+			<key>offsetX</key>
+			<real>0</real>
+			<key>offsetY</key>
+			<real>0</real>
+			<key>originalHeight</key>
+			<integer>40</integer>
+			<key>originalWidth</key>
+			<integer>40</integer>
+			<key>width</key>
+			<integer>40</integer>
+			<key>x</key>
+			<integer>256</integer>
+			<key>y</key>
+			<integer>186</integer>
+		</dict>
+		<key>Brick@2x.png</key>
+		<dict>
+			<key>height</key>
+			<integer>60</integer>
+			<key>offsetX</key>
+			<real>0</real>
+			<key>offsetY</key>
+			<real>0</real>
+			<key>originalHeight</key>
+			<integer>60</integer>
+			<key>originalWidth</key>
+			<integer>150</integer>
+			<key>width</key>
+			<integer>150</integer>
 			<key>x</key>
 			<integer>2</integer>
 			<key>y</key>
-			<integer>54</integer>
+			<integer>186</integer>
+		</dict>
+		<key>Eye@2x.png</key>
+		<dict>
+			<key>height</key>
+			<integer>100</integer>
+			<key>offsetX</key>
+			<real>0</real>
+			<key>offsetY</key>
+			<real>0</real>
+			<key>originalHeight</key>
+			<integer>100</integer>
+			<key>originalWidth</key>
+			<integer>100</integer>
+			<key>width</key>
+			<integer>100</integer>
+			<key>x</key>
+			<integer>2</integer>
+			<key>y</key>
+			<integer>2</integer>
+		</dict>
+		<key>Mouth@2x.png</key>
+		<dict>
+			<key>height</key>
+			<integer>50</integer>
+			<key>offsetX</key>
+			<real>0</real>
+			<key>offsetY</key>
+			<real>0</real>
+			<key>originalHeight</key>
+			<integer>50</integer>
+			<key>originalWidth</key>
+			<integer>100</integer>
+			<key>width</key>
+			<integer>100</integer>
+			<key>x</key>
+			<integer>154</integer>
+			<key>y</key>
+			<integer>186</integer>
+		</dict>
+		<key>Paddle@2x.png</key>
+		<dict>
+			<key>height</key>
+			<integer>80</integer>
+			<key>offsetX</key>
+			<real>0</real>
+			<key>offsetY</key>
+			<real>0</real>
+			<key>originalHeight</key>
+			<integer>80</integer>
+			<key>originalWidth</key>
+			<integer>260</integer>
+			<key>width</key>
+			<integer>260</integer>
+			<key>x</key>
+			<integer>2</integer>
+			<key>y</key>
+			<integer>104</integer>
 		</dict>
 	</dict>
 	<key>metadata</key>
@@ -143,20 +143,20 @@
 		<key>format</key>
 		<integer>0</integer>
 		<key>realTextureFileName</key>
-		<string>Sprites~ipad.png</string>
+		<string>Sprites@2x~ipad.png</string>
 		<key>size</key>
-		<string>{256,128}</string>
+		<string>{512,256}</string>
 		<key>smartupdate</key>
-		<string>$TexturePacker:SmartUpdate:01332dca85ebec8da02c66c3248f75ea$</string>
+		<string>$TexturePacker:SmartUpdate:144be34237f862132d324651afa495f8$</string>
 		<key>textureFileName</key>
-		<string>Sprites~ipad.png</string>
+		<string>Sprites@2x~ipad.png</string>
 	</dict>
 	<key>texture</key>
 	<dict>
 		<key>height</key>
-		<integer>128</integer>
-		<key>width</key>
 		<integer>256</integer>
+		<key>width</key>
+		<integer>512</integer>
 	</dict>
 </dict>
 </plist>
