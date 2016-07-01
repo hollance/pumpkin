@@ -1,22 +1,19 @@
 import simd
 
 /*! Model object for something that is displayed on the screen. */
-public class Node: Tweenable {
+public class Node: PositionTweenable, ScaleTweenable, AngleTweenable {
 
-  // TODO: these don't belong here but in Sprite
-  public var color = float4(1, 1, 1, 1)
-  public var alpha: Float = 1.0
-
-
-
+  /* The position of the node relative to its parent. */
   public var position = float2(0, 0) {
     didSet { localTransformDirty = true }
   }
 
+  /* The scale of the node (and its children). */
   public var scale = float2(1, 1) {
     didSet { localTransformDirty = true }
   }
 
+  /* The rotation angle of the node in degrees, clockwise. */
   public var angle: Float = 0 {
     didSet { localTransformDirty = true }
   }
@@ -193,7 +190,7 @@ public class Node: Tweenable {
 
 extension Node: CustomStringConvertible {
   public var description: String {
-    return String(format: "node %@", name)
+    return "node '\(name)'"
   }
 }
 

@@ -2,7 +2,7 @@ import simd
 import OpenGLES
 
 /*! Visual for a node that draws part of a texture. */
-public class Sprite: Visual, Tweenable, Renderer {
+public class Sprite: Visual, ColorTweenable, AlphaTweenable, Renderer {
   public weak var node: Node?
 
   private var quadDirty = true
@@ -65,12 +65,6 @@ public class Sprite: Visual, Tweenable, Renderer {
   public var alpha: Float = 1 {
     didSet { needsRedraw = true }
   }
-
-  // TODO: these belong only in Node
-  public var position = float2(0, 0)
-  public var scale = float2(1, 1)
-  public var angle: Float = 0
-
 
   /*! If this is not nil, the sprite is drawn using only a small region of a
       larger texture atlas. */
@@ -284,7 +278,7 @@ public class Sprite: Visual, Tweenable, Renderer {
 
   // MARK: - Rendering
 
-  /* This draws the Sprite when it is not part of a SpriteBatch. */
+  /*! This draws the Sprite when it is not part of a SpriteBatch. */
   public func render(context: RenderContext) {
     let shaderProgram: ShaderProgram
     if texture != nil {

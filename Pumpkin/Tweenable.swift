@@ -1,23 +1,30 @@
 import simd
 
-/*
- * Describes the properties of an object that can be used in a tween.
- */
+/* 
+  These protocols describe the properties of an object that can be used in
+  a tween. They're split up into different protocols because a Node, for 
+  example, does not have a color. But a Sprite does not have an angle, etc.
+*/
+
 public protocol Tweenable: class {
+}
 
-  // Implemented by Node
-
-  /* The position of the node relative to its parent. */
+public protocol PositionTweenable: Tweenable {
   var position: float2 { get set }
+}
 
-  /* The scale of the node (and its children). */
+public protocol ScaleTweenable: Tweenable {
   var scale: float2 { get set }
+}
 
-  /* The rotation angle of the node in degrees, clockwise. */
+public protocol AngleTweenable: Tweenable {
   var angle: Float { get set }
+}
 
-  // Implemented by Sprite
-
+public protocol ColorTweenable: Tweenable {
   var color: float4 { get set }
+}
+
+public protocol AlphaTweenable: Tweenable {
   var alpha: Float { get set }
 }

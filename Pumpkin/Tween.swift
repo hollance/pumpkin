@@ -105,7 +105,7 @@ public class BasicTween: Tween {
     assert(!completed, "Animation should not run if it is already completed")
 
     var t: Float = 0
-    if delayElapsed < self.delay {
+    if delayElapsed < self.delay {   // waiting for tween to start
       t = 0
       delayElapsed += dt
 
@@ -115,22 +115,21 @@ public class BasicTween: Tween {
       // lets you skip that.
       if waitUntilAfterDelay { return }
     }
-    else if elapsed < self.duration {
+    else if elapsed < self.duration {   // performing tween
       t = elapsed / self.duration
       elapsed += dt
     }
-    else  // done
-    {
+    else {       // done
       t = 1.0
       completed = true
     }
 
-    step(t: timingFunction(t), target: target!)
+    step(timingFunction(t))
   }
 
   internal override func finish() {
     if !isCompleted {
-      step(t: timingFunction(1), target: target!)
+      step(timingFunction(1))
       completed = true
     }
   }
@@ -149,7 +148,7 @@ public class BasicTween: Tween {
     elapsed = 0
   }
 
-  internal func step(t t: Float, target: Tweenable) {
+  internal func step(t: Float) {
     // subclass should implement this
   }
 }
@@ -168,12 +167,12 @@ public class MoveFromTween : BasicTween {
     previousValue = float2.zero
   }
 
-  internal override func step(t t: Float, target: Tweenable) {
+  internal override func step(t: Float) {
     // Note: The lerp is "s + (0 - s)t" which simplifies to "s(1 - t)".
     let value = amount * (1 - t)
     let diff = value - previousValue
     previousValue = value
-    target.position += diff
+    (target as? PositionTweenable)?.position += diff
   }
 }
 
@@ -190,12 +189,12 @@ public class MoveToTween : BasicTween {
     previousValue = float2.zero
   }
 
-  internal override func step(t t: Float, target: Tweenable) {
+  internal override func step(t: Float) {
     // Note: The lerp is "0 + (e - 0)t" which simplifies to "e*t".
     let value = amount * t
     let diff = value - previousValue
     previousValue = value
-    target.position += diff
+    (target as? PositionTweenable)?.position += diff
   }
 }
 
@@ -213,12 +212,12 @@ public class RotateFromTween : BasicTween {
     previousValue = 0
   }
 
-  internal override func step(t t: Float, target: Tweenable) {
+  internal override func step(t: Float) {
     // Note: The lerp is "s + (0 - s)t" which simplifies to "s(1 - t)".
     let value = amount * (1 - t)
     let diff = value - previousValue
     previousValue = value
-    target.angle += diff
+    (target as? AngleTweenable)?.angle += diff
   }
 }
 
@@ -235,12 +234,12 @@ public class RotateToTween : BasicTween {
     previousValue = 0
   }
 
-  internal override func step(t t: Float, target: Tweenable) {
+  internal override func step(t: Float) {
     // Note: The lerp is "0 + (e - 0)t" which simplifies to "e*t".
     let value = amount * t
     let diff = value - previousValue
     previousValue = value
-    target.angle += diff
+    (target as? AngleTweenable)?.angle += diff
   }
 }
 
@@ -258,12 +257,12 @@ public class ScaleFromTween : BasicTween {
     previousValue = float2(1, 1)
   }
 
-  internal override func step(t t: Float, target: Tweenable) {
+  internal override func step(t: Float) {
     // Note: The lerp is "s + (1 - s)*t", which simplifies to "t + s(1 - t)".
     let value = amount * (1 - t) + float2(t, t)
     let diff = value / previousValue
     previousValue = value
-    target.scale *= diff
+    (target as? ScaleTweenable)?.scale *= diff
   }
 }
 
@@ -281,12 +280,12 @@ public class ScaleToTween : BasicTween {
     previousValue = float2(1, 1)
   }
 
-  internal override func step(t t: Float, target: Tweenable) {
+  internal override func step(t: Float) {
     // Note: The lerp is "1 + (e - 1)*t", which simplifies to "e*t + 1 - t".
     let value = amount * t + float2(1 - t)
     let diff = value / previousValue
     previousValue = value
-    target.scale *= diff
+    (target as? ScaleTweenable)?.scale *= diff
   }
 }
 
@@ -304,8 +303,8 @@ public class TintTween : BasicTween {
   public var startColor = float4.zero
   public var endColor = float4.zero
 
-  internal override func step(t t: Float, target: Tweenable) {
-    target.color = mix(startColor, endColor, t: t)
+  internal override func step(t: Float) {
+    (target as? ColorTweenable)?.color = mix(startColor, endColor, t: t)
   }
 }
 
@@ -323,7 +322,7 @@ public class FadeTween : BasicTween {
   public var startAlpha: Float = 0
   public var endAlpha: Float = 0
 
-  internal override func step(t t: Float, target: Tweenable) {
-    target.alpha = fclampf(flerpf(start: startAlpha, end: endAlpha, t: t), min: 0, max: 1)
+  internal override func step(t: Float) {
+    (target as? AlphaTweenable)?.alpha = fclampf(flerpf(start: startAlpha, end: endAlpha, t: t), min: 0, max: 1)
   }
 }
