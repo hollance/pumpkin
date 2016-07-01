@@ -195,23 +195,10 @@ extension Settings {
   mutating func customizeEffects() {
     allEffects()
 
-    musicEnabled = false
+//    musicEnabled = false
     maxBalls = 1
     ballType = 2
-    tweenLogo = true
-
-//    colorEnabled = true
-//    paddleStretch = true
-//    paddleFace = true
-//    paddleEyeScale = 0.8
-//    paddleEyeSeparation = 45
-//    paddleLookAtBall = true
-//    paddleMouthScale = 0.8
-//
-//    tweeningEnabled = true
-//    tweenBorders = true
-//    tweeningDuration = 2
-//    tweeningDelay = 0
-//    easingEquation = 2
+    tweenLogo = false
+    screenZoomEnabled = false
   }
 }

@@ -74,6 +74,10 @@ public func vectorWithRGBA(r: Int, _ g: Int, _ b: Int, _ a: Int) -> float4 {
 	return float4(Float(r)/255, Float(g)/255, Float(b)/255, Float(a)/255)
 }
 
+public func randomColor() -> float4 {
+  return float4(Float.random(), Float.random(), Float.random(), 1)
+}
+
 /*! Returns the width in points of a bounding box described by a GLKVector4. */
 public func boxWidth(box: float4) -> Float {
 	return box.z - box.x
