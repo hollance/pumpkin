@@ -6,9 +6,7 @@ public protocol EngineDelegate: class {
   func update(dt: Float)
 }
 
-/*!
- * The main class. It owns everything else.
- */
+/*! The main class. It owns everything else. */
 public class Engine {
   /*! Connect this to your main game loop. */
   public weak var delegate: EngineDelegate?

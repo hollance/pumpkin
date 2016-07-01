@@ -10,21 +10,4 @@ public protocol Visual {
 
   /*! Temporarily stops drawing this visual. */
   var hidden: Bool { get set }
-
-
-  // The following were @optional in the Objective-C version:
-
-  /*! The point in the visual where it is attached to the node, normalized to 
-      the range 0.0f - 1.0f. The default value is (0.5f, 0.5f), i.e. the center
-      of the image. */
-  var anchorPoint: float2 { get set }
-
-  /*! Whether the visual is displayed horizontally flipped. */
-  var flipX: Bool { get set }
-
-  /*! Whether the visual is displayed vertically flipped. */
-  var flipY: Bool { get set }
-
-  var contentSize: float2 { get }
-  var texCoords: float4 { get }
 }

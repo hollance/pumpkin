@@ -19,14 +19,19 @@ public class Sprite: Visual, Tweenable, Renderer {
     didSet { needsRedraw = true }
   }
 
+  /*! The point in the sprite where it is attached to the node, normalized to
+      the range 0.0f - 1.0f. The default value is (0.5f, 0.5f), i.e. the center
+      of the image. */
   public var anchorPoint = float2(0.5, 0.5) {
     didSet { needsRedraw = true }
   }
 
+  /*! Whether the sprite is displayed horizontally flipped. */
   public var flipX: Bool = false {
     didSet { needsRedraw = true }
   }
 
+  /*! Whether the sprite is displayed vertically flipped. */
   public var flipY: Bool = false {
     didSet { needsRedraw = true }
   }
