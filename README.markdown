@@ -1,14 +1,46 @@
 # Pumpkin Engine
 
-I made this a while ago to experiment with tweening and adding "juicy" effects to a basic 2D game engine.
+I made this a while ago to experiment with tweening and adding **juicy** effects to a basic 2D game engine. I recently ported it to Swift and cleaned it up. The goal is to port it from OpenGL to Metal at some point.
 
-The demo game is based on the excellent talk [Juice It or Lose It](https://www.youtube.com/watch?v=Fy0aCDmgnxg) by Martin Jonasson & Petri Purho (2012). [Their GitHub repo](https://github.com/grapefrukt/juicy-breakout)
+Here's a quick demo (it looks much smoother in real life, of course):
+
+![Juicy Breakout](Breakout.gif)
+
+Notice how everything bounces all over the place! :-) If you turn off the special effects it looks pretty boring, but the game comes alive with simple tweens on the positions, scale, rotation angle, and colors of the sprites.
+
+The demo game is based on the excellent talk [Juice It or Lose It](https://www.youtube.com/watch?v=Fy0aCDmgnxg) by Martin Jonasson & Petri Purho (2012). See also [their GitHub repo](https://github.com/grapefrukt/juicy-breakout).
 
 Another great demonstration of juice is the talk [Adding Juice to your Games](https://www.youtube.com/watch?v=5aGFPpMvILY) by Ray Wenderlich (AltConf 2014).
 
+For similar functionality in Sprite Kit, see the `SKTEffects` classes in [SKTUtils](http://github.com/raywenderlich/SKTUtils/).
+
 Pumpkin makes it easy to add all kinds of juicy effects. But really it's primarily a playground for me to experiment with stuff like this, not an engine intended for usage in real games.
 
+> Note: the effects in the demo are quite extreme. In a real game you'd probably want to tone it down a little and not give your players a seizure. ;-)
+
+The source code in this repo is licensed under the terms of the MIT license. The music in the demo is [Pinball Spring by Kevin MacLeod (incompetech.com)](http://incompetech.com), licensed under [Creative Commons: By Attribution 3.0](https://creativecommons.org/licenses/by/3.0/).
+
+## Using the demo
+
+Just run the **Breakout** project in the iOS simulator or on a device. The game looks best on the iPad; it simply gets scaled to fit on other devices, which can look a little funky.
+
+There are tons of effects you can enable and disable. See the file **Settings.swift**, in particular the `customizeEffects()` function.
+
+Perform a **two-finger long press** to restart the game. On the simulator you do this by holding down Alt/Option and clicking the mouse.
+
+> Note: there are a few small "bugs" with effects that don't work well together. For example: when, at the start of the game, the ball hits a brick while the bricks are still appearing, the scale of the bricks may be wrong for a few moments. This isn't an issue with the tweens, but just too much happening at the same time.
+
+## To do
+
+- Convert to Swift 3. Pretty straightforward but on the current beta OpenGL is really slow in the simulator.
+
+- Convert OpenGL to Metal. Or possibly have both options available.
+
+- Add missing features: particle effects, ball trail, shattering bricks when they get hit. I originally ported this game to Cocos2D, which comes with some of these features built in, but I did not get around to implementing them myself yet.
+
 ## Architecture
+
+Some notes about the design of the engine.
 
 ### Nodes
 
@@ -165,4 +197,4 @@ The engine uses `float2` for many of its data structures, including `TexturedVer
 
 That's why the rest of the engine uses `Float` instead of `CGFloat` too.
 
-The delta time is a `Float`, not `NSTimeInterval` or `CFTimeInterval` because those are defined as a double. Using a double for calculations with float values will promote those floats to doubles, making them slower on 32-bit.
+The delta time is a `Float`, not `NSTimeInterval` or `CFTimeInterval` because those are defined as a double. Using a double for calculations with float values will promote those floats to doubles, making them slower on 32-bit. (Not really a concern anymore but it was when I first implemented this.)
